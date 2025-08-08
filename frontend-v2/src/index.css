@@ -4,28 +4,120 @@
 
 html {
   font-family: 'Inter', system-ui, sans-serif;
+  overflow-x: hidden;
 }
 
 body {
   background-color: #f9fafb;
   color: #111827;
+  overflow-x: hidden;
+}
+
+/* ===== PREVENT HORIZONTAL SCROLL ===== */
+* {
+  box-sizing: border-box;
+}
+
+/* ===== HEADLESS UI DROPDOWN ===== */
+.dropdown-menu {
+  margin-top: 0.5rem;
+  min-width: 200px;
+  z-index: 1000;
+  background-color: white;
+  border: 1px solid rgba(0, 0, 0, 0.175);
+  border-radius: 0.375rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  padding: 0.5rem 0;
+  display: block !important;
+}
+
+.dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  clear: both;
+  font-weight: 400;
+  color: #212529;
+  text-align: inherit;
+  text-decoration: none;
+  white-space: nowrap;
+  background-color: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.dropdown-item:hover,
+.dropdown-item.active {
+  color: #1e2125;
+  background-color: #e9ecef;
+}
+
+.dropdown-divider {
+  height: 0;
+  margin: 0.5rem 0;
+  border: 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.175);
+}
+
+/* ===== POPOVER SPECIFIC ===== */
+[data-headlessui-state="open"] {
+  display: block !important;
 }
 
 /* ===== NAVBAR ICONS ===== */
-.navbar .bi {
-  font-size: 1rem;
-  line-height: 1;
-  vertical-align: middle;
+.navbar .w-4 {
+  width: 1.25rem;
 }
 
-.navbar-nav .nav-link .bi {
-  margin-right: 0.25rem;
+.navbar .h-4 {
+  height: 1.25rem;
 }
 
-.dropdown-item .bi {
+.navbar-nav .nav-link .w-4 {
+  margin-right: 0.5rem;
+}
+
+.navbar-nav .nav-link {
   font-size: 1rem;
-  line-height: 1;
-  vertical-align: middle;
+  font-weight: 500;
+  padding: 0.75rem 1rem !important;
+  white-space: nowrap;
+}
+
+.navbar-brand {
+  font-size: 1.25rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ===== RESPONSIVE NAVBAR ===== */
+@media (max-width: 991.98px) {
+  .navbar-nav .nav-link {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem !important;
+  }
+
+  .navbar-brand {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .navbar-nav .nav-link {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.5rem !important;
+  }
+
+  .navbar-brand {
+    font-size: 1rem;
+  }
+}
+
+/* ===== MOBILE MENU FIX ===== */
+.navbar-collapse.position-absolute {
+  z-index: 1050;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border-radius: 0 0 0.5rem 0.5rem;
 }
 
 /* ===== DASHBOARD ===== */

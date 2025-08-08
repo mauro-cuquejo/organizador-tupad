@@ -1,45 +1,76 @@
 import { useAuthStore } from '@/stores/authStore'
 import { Link, useLocation } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { useBootstrap } from '@/hooks/useBootstrap'
+import { Popover } from '@headlessui/react'
+import { Fragment, useState, useEffect, useRef } from 'react'
+import {
+  HomeIcon,
+  CalendarIcon,
+  BookOpenIcon,
+  DocumentTextIcon,
+  ClipboardDocumentCheckIcon,
+  BellIcon,
+  UserGroupIcon,
+  UserCircleIcon,
+  ArrowRightOnRectangleIcon,
+  SunIcon,
+  Bars3Icon,
+  XMarkIcon,
+  ChevronDownIcon
+} from '@heroicons/react/24/outline'
 
 export function Header() {
   const { user, logout } = useAuthStore()
   const location = useLocation()
-
-  // Inicializar Bootstrap
-  useBootstrap()
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+  const dropdownRef = useRef<HTMLLIElement>(null)
 
   const navItems = [
-    { path: '/dashboard', icon: 'bi-house', label: 'Dashboard' },
-    { path: '/horarios', icon: 'bi-calendar3', label: 'Horarios' },
-    { path: '/materias', icon: 'bi-book', label: 'Materias' },
-    { path: '/contenidos', icon: 'bi-file-text', label: 'Contenidos' },
-    { path: '/evaluaciones', icon: 'bi-clipboard-check', label: 'Evaluaciones' },
-    { path: '/notificaciones', icon: 'bi-bell', label: 'Notificaciones' },
+    { path: '/dashboard', icon: HomeIcon, label: 'Dashboard' },
+    { path: '/horarios', icon: CalendarIcon, label: 'Horarios' },
+    { path: '/materias', icon: BookOpenIcon, label: 'Materias' },
+    { path: '/contenidos', icon: DocumentTextIcon, label: 'Contenidos' },
+    { path: '/evaluaciones', icon: ClipboardDocumentCheckIcon, label: 'Evaluaciones' },
+    { path: '/notificaciones', icon: BellIcon, label: 'Notificaciones' },
   ]
 
   // Solo mostrar Profesores para admin o profesor
   if (user?.rol === 'admin' || user?.rol === 'profesor') {
-    navItems.push({ path: '/profesores', icon: 'bi-person-badge', label: 'Profesores' })
+    navItems.push({ path: '/profesores', icon: UserGroupIcon, label: 'Profesores' })
   }
 
-  const handleLogout = (e: React.MouseEvent) => {
-    e.preventDefault()
+  // Cerrar dropdown al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsUserMenuOpen(false)
+      }
+    }
+
+    if (isUserMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isUserMenuOpen])
+
+  const handleLogout = () => {
     logout()
+    setIsUserMenuOpen(false)
   }
 
-  const handleDropdownClick = (e: React.MouseEvent, option: string) => {
-    e.preventDefault()
+  const handleDropdownClick = (option: string) => {
     toast(`${option} - Función en desarrollo`, {
       duration: 2000,
     })
+    setIsUserMenuOpen(false)
   }
 
-  const handleNavClick = (e: React.MouseEvent, path: string) => {
+  const handleNavClick = (path: string) => {
     // Si no es dashboard, mostrar toast de desarrollo
     if (path !== '/dashboard') {
-      e.preventDefault()
       const label = path.replace('/', '').charAt(0).toUpperCase() + path.slice(2)
       toast(`${label} - Función en desarrollo`, {
         duration: 2000,
@@ -47,29 +78,95 @@ export function Header() {
     }
   }
 
+  const userMenuItems = [
+    { id: 'profile', label: 'Mi Perfil', icon: 'bi-person', action: () => handleDropdownClick('Mi Perfil') },
+    { id: 'stats', label: 'Estadísticas', icon: 'bi-graph-up', action: () => handleDropdownClick('Estadísticas') },
+    { id: 'theme', label: 'Tema Claro', icon: SunIcon, action: () => handleDropdownClick('Cambiar Tema') },
+    { id: 'logout', label: 'Cerrar Sesión', icon: ArrowRightOnRectangleIcon, action: handleLogout }
+  ]
+
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
-      <div className="container-fluid">
+      <div className="container">
         <Link className="navbar-brand" to="/dashboard">
           <i className="bi bi-mortarboard-fill me-2"></i>
           TUPAD Organizador
         </Link>
 
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
+        {/* Mobile menu */}
+        <Popover as="div" className="d-lg-none">
+          {({ open }) => (
+            <>
+              <Popover.Button className="navbar-toggler border-0">
+                {open ? (
+                  <XMarkIcon className="w-6 h-6" />
+                ) : (
+                  <Bars3Icon className="w-6 h-6" />
+                )}
+              </Popover.Button>
+              <Popover.Panel className="navbar-collapse position-absolute top-100 start-0 w-100 bg-primary">
+                <ul className="navbar-nav me-auto">
+                  {navItems.map((item) => {
+                    const Icon = item.icon
+                    const isActive = location.pathname === item.path
 
-        <div className="collapse navbar-collapse" id="navbarNav">
+                    return (
+                      <li className="nav-item" key={item.path}>
+                        <Link
+                          className={`nav-link ${isActive ? 'active' : ''}`}
+                          to={item.path}
+                          onClick={() => handleNavClick(item.path)}
+                        >
+                          <Icon className="w-5 h-5 me-1" />
+                          {item.label}
+                          {item.path === '/notificaciones' && (
+                            <span className="badge bg-danger ms-1">3</span>
+                          )}
+                        </Link>
+                      </li>
+                    )
+                  })}
+                </ul>
+                <ul className="navbar-nav">
+                  <li className="nav-item dropdown" ref={dropdownRef}>
+                    <button
+                      className="nav-link dropdown-toggle d-flex align-items-center"
+                      onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                    >
+                      <UserCircleIcon className="w-5 h-5 me-1" />
+                      {user?.nombre} {user?.apellido}
+                      <ChevronDownIcon className="w-4 h-4 ms-1" />
+                    </button>
+                    {isUserMenuOpen && (
+                      <div className="dropdown-menu dropdown-menu-end position-absolute show">
+                        {userMenuItems.map((item) => (
+                          <button
+                            key={item.id}
+                            className="dropdown-item"
+                            onClick={item.action}
+                          >
+                            {typeof item.icon === 'string' ? (
+                              <i className={`${item.icon} me-2`}></i>
+                            ) : (
+                              <item.icon className="w-4 h-4 me-2" />
+                            )}
+                            {item.label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </li>
+                </ul>
+              </Popover.Panel>
+            </>
+          )}
+        </Popover>
+
+        {/* Desktop menu */}
+        <div className="navbar-collapse d-none d-lg-flex">
           <ul className="navbar-nav me-auto">
             {navItems.map((item) => {
+              const Icon = item.icon
               const isActive = location.pathname === item.path
 
               return (
@@ -77,9 +174,9 @@ export function Header() {
                   <Link
                     className={`nav-link ${isActive ? 'active' : ''}`}
                     to={item.path}
-                    onClick={(e) => handleNavClick(e, item.path)}
+                    onClick={() => handleNavClick(item.path)}
                   >
-                    <i className={`${item.icon} me-1`}></i>
+                    <Icon className="w-5 h-5 me-1" />
                     {item.label}
                     {item.path === '/notificaciones' && (
                       <span className="badge bg-danger ms-1">3</span>
@@ -91,45 +188,33 @@ export function Header() {
           </ul>
 
           <ul className="navbar-nav">
-            <li className="nav-item dropdown">
-              <a
-                className="nav-link dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
+            <li className="nav-item dropdown" ref={dropdownRef}>
+              <button
+                className="nav-link dropdown-toggle d-flex align-items-center"
+                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
               >
-                <i className="bi bi-person-circle me-1"></i>
+                <UserCircleIcon className="w-5 h-5 me-1" />
                 {user?.nombre} {user?.apellido}
-              </a>
-              <ul className="dropdown-menu dropdown-menu-end">
-                <li>
-                  <a className="dropdown-item" href="#" onClick={(e) => handleDropdownClick(e, 'Mi Perfil')}>
-                    <i className="bi bi-person me-2"></i>
-                    Mi Perfil
-                  </a>
-                </li>
-                <li>
-                  <a className="dropdown-item" href="#" onClick={(e) => handleDropdownClick(e, 'Estadísticas')}>
-                    <i className="bi bi-graph-up me-2"></i>
-                    Estadísticas
-                  </a>
-                </li>
-                <li><hr className="dropdown-divider" /></li>
-                <li>
-                  <a className="dropdown-item" href="#" onClick={(e) => handleDropdownClick(e, 'Cambiar Tema')}>
-                    <i className="bi bi-sun me-2"></i>
-                    Tema Claro
-                  </a>
-                </li>
-                <li><hr className="dropdown-divider" /></li>
-                <li>
-                  <a className="dropdown-item" href="#" onClick={handleLogout}>
-                    <i className="bi bi-box-arrow-right me-2"></i>
-                    Cerrar Sesión
-                  </a>
-                </li>
-              </ul>
+                <ChevronDownIcon className="w-4 h-4 ms-1" />
+              </button>
+              {isUserMenuOpen && (
+                <div className="dropdown-menu dropdown-menu-end position-absolute show">
+                  {userMenuItems.map((item) => (
+                    <button
+                      key={item.id}
+                      className="dropdown-item"
+                      onClick={item.action}
+                    >
+                      {typeof item.icon === 'string' ? (
+                        <i className={`${item.icon} me-2`}></i>
+                      ) : (
+                        <item.icon className="w-4 h-4 me-2" />
+                      )}
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
+              )}
             </li>
           </ul>
         </div>

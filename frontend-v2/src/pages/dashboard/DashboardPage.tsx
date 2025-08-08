@@ -1,18 +1,18 @@
 import { useEffect, useState } from 'react'
 import { useAuthStore } from '@/stores/authStore'
 import {
-  BookOpen,
-  Clock,
-  Users,
-  TrendingUp,
-  Calendar,
-  Bell,
-  Home,
-  RotateCcw,
-  Download,
-  FileText,
-  ClipboardCheck
-} from 'lucide-react'
+  BookOpenIcon,
+  ClockIcon,
+  UsersIcon,
+  ChartBarIcon,
+  CalendarIcon,
+  BellIcon,
+  HomeIcon,
+  ArrowPathIcon,
+  ArrowDownTrayIcon,
+  DocumentTextIcon,
+  ClipboardDocumentCheckIcon
+} from '@heroicons/react/24/outline'
 
 interface DashboardStats {
   totalMaterias: number
@@ -70,7 +70,7 @@ export function DashboardPage() {
         <div className="row align-items-center">
           <div className="col-md-6">
             <h1 className="dashboard-title">
-              <Home className="me-2" />
+              <HomeIcon className="w-8 h-8 me-2" />
               Dashboard
             </h1>
             <p className="dashboard-subtitle">
@@ -83,14 +83,14 @@ export function DashboardPage() {
               onClick={refreshDashboard}
               disabled={loading}
             >
-              <RotateCcw className="me-1" size={16} />
+              <ArrowPathIcon className="w-4 h-4 me-1" />
               Actualizar
             </button>
             <button
               className="btn btn-outline-light"
               onClick={exportReport}
             >
-              <Download className="me-1" size={16} />
+              <ArrowDownTrayIcon className="w-4 h-4 me-1" />
               Exportar
             </button>
           </div>
@@ -120,7 +120,7 @@ export function DashboardPage() {
                       <h2 className="stat-number">{stats.totalMaterias}</h2>
                     </div>
                     <div className="stat-icon">
-                      <BookOpen size={32} />
+                      <BookOpenIcon className="w-8 h-8" />
                     </div>
                   </div>
                   <div className="stat-footer">
@@ -141,7 +141,7 @@ export function DashboardPage() {
                       <h2 className="stat-number">{stats.totalHorarios}</h2>
                     </div>
                     <div className="stat-icon">
-                      <Calendar size={32} />
+                      <CalendarIcon className="w-8 h-8" />
                     </div>
                   </div>
                   <div className="stat-footer">
@@ -162,7 +162,7 @@ export function DashboardPage() {
                       <h2 className="stat-number">{stats.totalContenidos}</h2>
                     </div>
                     <div className="stat-icon">
-                      <FileText size={32} />
+                      <DocumentTextIcon className="w-8 h-8" />
                     </div>
                   </div>
                   <div className="stat-footer">
@@ -183,7 +183,7 @@ export function DashboardPage() {
                       <h2 className="stat-number">{stats.totalEvaluaciones}</h2>
                     </div>
                     <div className="stat-icon">
-                      <ClipboardCheck size={32} />
+                      <ClipboardDocumentCheckIcon className="w-8 h-8" />
                     </div>
                   </div>
                   <div className="stat-footer">
@@ -202,7 +202,7 @@ export function DashboardPage() {
               <div className="card">
                 <div className="card-header">
                   <h5 className="card-title mb-0">
-                    <TrendingUp className="me-2" />
+                    <ChartBarIcon className="w-5 h-5 me-2" />
                     Acciones Rápidas
                   </h5>
                 </div>
