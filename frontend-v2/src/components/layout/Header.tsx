@@ -24,6 +24,7 @@ export function Header() {
   const location = useLocation()
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const dropdownRef = useRef<HTMLLIElement>(null)
+  const [isMobile, setIsMobile] = useState(false)
 
   const navItems = [
     { path: '/dashboard', icon: HomeIcon, label: 'Dashboard' },
@@ -38,6 +39,28 @@ export function Header() {
   if (user?.rol === 'admin' || user?.rol === 'profesor') {
     navItems.push({ path: '/profesores', icon: UserGroupIcon, label: 'Profesores' })
   }
+
+  // Detectar cambios en el tamaño de la ventana
+  useEffect(() => {
+    const checkScreenSize = () => {
+      const mobile = window.innerWidth < 992 // Bootstrap lg breakpoint
+      if (mobile !== isMobile) {
+        setIsMobile(mobile)
+        // Cerrar dropdown cuando cambia el tamaño de pantalla
+        setIsUserMenuOpen(false)
+      }
+    }
+
+    // Verificar tamaño inicial
+    checkScreenSize()
+
+    // Escuchar cambios de tamaño
+    window.addEventListener('resize', checkScreenSize)
+
+    return () => {
+      window.removeEventListener('resize', checkScreenSize)
+    }
+  }, [isMobile])
 
   // Cerrar dropdown al hacer clic fuera
   useEffect(() => {
