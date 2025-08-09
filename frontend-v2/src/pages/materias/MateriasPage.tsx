@@ -23,16 +23,9 @@ export function MateriasPage() {
   const [totalMaterias, setTotalMaterias] = useState(0)
   const [showInactive, setShowInactive] = useState(false)
   const [isSearching, setIsSearching] = useState(false)
-  
+
   // Filtros avanzados
-  const [filters, setFilters] = useState<MateriasFilters>({
-    page: 1,
-    limit: 10,
-    activo: true
-  })
   const [creditosFilter, setCreditosFilter] = useState<string>('')
-  const [nombreFilter, setNombreFilter] = useState<string>('')
-  const [codigoFilter, setCodigoFilter] = useState<string>('')
 
   const loadMaterias = useCallback(async () => {
     setLoading(true)
@@ -47,12 +40,6 @@ export function MateriasPage() {
       if (creditosFilter) {
         params.creditos = creditosFilter as '1-3' | '4-6' | '7-9' | '10+'
       }
-      if (nombreFilter.trim()) {
-        params.nombre = nombreFilter.trim()
-      }
-      if (codigoFilter.trim()) {
-        params.codigo = codigoFilter.trim()
-      }
 
       const response = await materiasService.getAll(params)
       setMaterias(response.materias)
@@ -64,7 +51,7 @@ export function MateriasPage() {
     } finally {
       setLoading(false)
     }
-  }, [currentPage, showInactive, creditosFilter, nombreFilter, codigoFilter])
+  }, [currentPage, showInactive, creditosFilter])
 
   const searchMaterias = useCallback(async (query: string) => {
     if (!query.trim()) {
@@ -120,8 +107,6 @@ export function MateriasPage() {
 
   const handleClearFilters = () => {
     setCreditosFilter('')
-    setNombreFilter('')
-    setCodigoFilter('')
     setCurrentPage(1)
   }
 
@@ -161,7 +146,7 @@ export function MateriasPage() {
   }
 
   // Verificar si hay filtros activos
-  const hasActiveFilters = creditosFilter || nombreFilter.trim() || codigoFilter.trim()
+  const hasActiveFilters = creditosFilter
 
   return (
     <div className="materias-page">
@@ -227,7 +212,7 @@ export function MateriasPage() {
         <div className="card-body">
           <div className="row g-3">
             {/* Búsqueda principal */}
-            <div className="col-md-4">
+            <div className="col-md-6">
               <label className="form-label">Buscar por nombre o código</label>
               <div className="input-group">
                 <input
@@ -258,42 +243,10 @@ export function MateriasPage() {
               </div>
             </div>
 
-            {/* Filtro por nombre */}
-            <div className="col-md-2">
-              <label className="form-label">Nombre</label>
-              <input
-                type="text"
-                className="form-control"
-                placeholder="Filtrar por nombre..."
-                value={nombreFilter}
-                onChange={(e) => {
-                  setNombreFilter(e.target.value)
-                  handleFilterChange()
-                }}
-                disabled={isSearching}
-              />
-            </div>
-
-            {/* Filtro por código */}
-            <div className="col-md-2">
-              <label className="form-label">Código</label>
-              <input
-                type="text"
-                className="form-control"
-                placeholder="Filtrar por código..."
-                value={codigoFilter}
-                onChange={(e) => {
-                  setCodigoFilter(e.target.value)
-                  handleFilterChange()
-                }}
-                disabled={isSearching}
-              />
-            </div>
-
             {/* Filtro por créditos */}
-            <div className="col-md-2">
+            <div className="col-md-3">
               <label className="form-label">Créditos</label>
-              <select 
+              <select
                 className="form-select"
                 value={creditosFilter}
                 onChange={(e) => {
@@ -311,7 +264,7 @@ export function MateriasPage() {
             </div>
 
             {/* Filtro por estado */}
-            <div className="col-md-1">
+            <div className="col-md-3">
               <label className="form-label">Estado</label>
               <div className="form-check">
                 <input
@@ -326,21 +279,9 @@ export function MateriasPage() {
                   disabled={isSearching}
                 />
                 <label className="form-check-label" htmlFor="showInactive">
-                  Inactivas
+                  Mostrar Inactivas
                 </label>
               </div>
-            </div>
-
-            {/* Botón actualizar */}
-            <div className="col-md-1">
-              <label className="form-label">&nbsp;</label>
-              <button
-                className="btn btn-outline-secondary w-100"
-                onClick={loadMaterias}
-                disabled={loading}
-              >
-                <FunnelIcon className="w-4 h-4" />
-              </button>
             </div>
           </div>
         </div>
@@ -368,7 +309,7 @@ export function MateriasPage() {
                   <BookOpenIcon className="w-16 h-16 text-muted mb-3" />
                   <h4>No se encontraron materias</h4>
                   <p>
-                    {searchTerm ? `No hay materias que coincidan con "${searchTerm}".` : 
+                    {searchTerm ? `No hay materias que coincidan con "${searchTerm}".` :
                      hasActiveFilters ? 'No hay materias que coincidan con los filtros aplicados.' :
                      'No hay materias registradas.'}
                   </p>
@@ -388,10 +329,12 @@ export function MateriasPage() {
                       )}
                     </div>
                   )}
-                  <button className="btn btn-primary" onClick={handleCreateMateria}>
-                    <PlusIcon className="w-4 h-4 me-2" />
-                    Crear primera materia
-                  </button>
+                  <div className="mt-3">
+                    <button className="btn btn-primary" onClick={handleCreateMateria}>
+                      <PlusIcon className="w-4 h-4 me-2" />
+                      Crear primera materia
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
