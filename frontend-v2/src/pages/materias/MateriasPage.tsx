@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useAuthStore } from '@/stores/authStore'
-import { materiasService, type Materia } from '@/services/materiasService'
+import { materiasService, type Materia, type MateriasFilters } from '@/services/materiasService'
 import toast from 'react-hot-toast'
 import {
   BookOpenIcon,
@@ -9,7 +9,8 @@ import {
   PencilIcon,
   TrashIcon,
   EyeIcon,
-  FunnelIcon
+  FunnelIcon,
+  XMarkIcon
 } from '@heroicons/react/24/outline'
 
 export function MateriasPage() {
@@ -22,14 +23,35 @@ export function MateriasPage() {
   const [totalMaterias, setTotalMaterias] = useState(0)
   const [showInactive, setShowInactive] = useState(false)
   const [isSearching, setIsSearching] = useState(false)
+  
+  // Filtros avanzados
+  const [filters, setFilters] = useState<MateriasFilters>({
+    page: 1,
+    limit: 10,
+    activo: true
+  })
+  const [creditosFilter, setCreditosFilter] = useState<string>('')
+  const [nombreFilter, setNombreFilter] = useState<string>('')
+  const [codigoFilter, setCodigoFilter] = useState<string>('')
 
   const loadMaterias = useCallback(async () => {
     setLoading(true)
     try {
-      const params = {
+      const params: MateriasFilters = {
         page: currentPage,
         limit: 10,
         activo: showInactive ? undefined : true
+      }
+
+      // Aplicar filtros avanzados
+      if (creditosFilter) {
+        params.creditos = creditosFilter as '1-3' | '4-6' | '7-9' | '10+'
+      }
+      if (nombreFilter.trim()) {
+        params.nombre = nombreFilter.trim()
+      }
+      if (codigoFilter.trim()) {
+        params.codigo = codigoFilter.trim()
       }
 
       const response = await materiasService.getAll(params)
@@ -42,7 +64,7 @@ export function MateriasPage() {
     } finally {
       setLoading(false)
     }
-  }, [currentPage, showInactive])
+  }, [currentPage, showInactive, creditosFilter, nombreFilter, codigoFilter])
 
   const searchMaterias = useCallback(async (query: string) => {
     if (!query.trim()) {
@@ -96,6 +118,18 @@ export function MateriasPage() {
     setIsSearching(false)
   }
 
+  const handleClearFilters = () => {
+    setCreditosFilter('')
+    setNombreFilter('')
+    setCodigoFilter('')
+    setCurrentPage(1)
+  }
+
+  const handleFilterChange = () => {
+    setCurrentPage(1)
+    // Los filtros se aplicarán automáticamente en el useEffect
+  }
+
   const handleDelete = async (id: number, nombre: string) => {
     if (window.confirm(`¿Estás seguro de que quieres eliminar la materia "${nombre}"?`)) {
       try {
@@ -126,6 +160,9 @@ export function MateriasPage() {
     toast.success(`Viendo materia ${id} - En desarrollo`)
   }
 
+  // Verificar si hay filtros activos
+  const hasActiveFilters = creditosFilter || nombreFilter.trim() || codigoFilter.trim()
+
   return (
     <div className="materias-page">
       {/* Header */}
@@ -139,6 +176,7 @@ export function MateriasPage() {
             <p className="page-subtitle">
               Administra las materias académicas ({totalMaterias} total)
               {isSearching && <span className="ms-2 badge bg-info">Buscando...</span>}
+              {hasActiveFilters && <span className="ms-2 badge bg-warning">Filtros activos</span>}
             </p>
           </div>
           <div className="col-md-6 text-end">
@@ -170,13 +208,25 @@ export function MateriasPage() {
       {/* Filtros y Búsqueda */}
       <div className="card filters-card mb-4">
         <div className="card-header">
-          <h5 className="card-title mb-0">
-            <FunnelIcon className="w-5 h-5 me-2" />
-            Filtros de Búsqueda
-          </h5>
+          <div className="d-flex justify-content-between align-items-center">
+            <h5 className="card-title mb-0">
+              <FunnelIcon className="w-5 h-5 me-2" />
+              Filtros de Búsqueda
+            </h5>
+            {hasActiveFilters && (
+              <button
+                className="btn btn-outline-danger btn-sm"
+                onClick={handleClearFilters}
+              >
+                <XMarkIcon className="w-4 h-4 me-1" />
+                Limpiar Filtros
+              </button>
+            )}
+          </div>
         </div>
         <div className="card-body">
           <div className="row g-3">
+            {/* Búsqueda principal */}
             <div className="col-md-4">
               <label className="form-label">Buscar por nombre o código</label>
               <div className="input-group">
@@ -207,25 +257,51 @@ export function MateriasPage() {
                 )}
               </div>
             </div>
-            <div className="col-md-3">
-              <label className="form-label">Estado</label>
-              <div className="form-check">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  id="showInactive"
-                  checked={showInactive}
-                  onChange={(e) => setShowInactive(e.target.checked)}
-                  disabled={isSearching}
-                />
-                <label className="form-check-label" htmlFor="showInactive">
-                  Mostrar inactivas
-                </label>
-              </div>
+
+            {/* Filtro por nombre */}
+            <div className="col-md-2">
+              <label className="form-label">Nombre</label>
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Filtrar por nombre..."
+                value={nombreFilter}
+                onChange={(e) => {
+                  setNombreFilter(e.target.value)
+                  handleFilterChange()
+                }}
+                disabled={isSearching}
+              />
             </div>
-            <div className="col-md-3">
+
+            {/* Filtro por código */}
+            <div className="col-md-2">
+              <label className="form-label">Código</label>
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Filtrar por código..."
+                value={codigoFilter}
+                onChange={(e) => {
+                  setCodigoFilter(e.target.value)
+                  handleFilterChange()
+                }}
+                disabled={isSearching}
+              />
+            </div>
+
+            {/* Filtro por créditos */}
+            <div className="col-md-2">
               <label className="form-label">Créditos</label>
-              <select className="form-select" disabled={isSearching}>
+              <select 
+                className="form-select"
+                value={creditosFilter}
+                onChange={(e) => {
+                  setCreditosFilter(e.target.value)
+                  handleFilterChange()
+                }}
+                disabled={isSearching}
+              >
                 <option value="">Todos</option>
                 <option value="1-3">1-3 créditos</option>
                 <option value="4-6">4-6 créditos</option>
@@ -233,15 +309,37 @@ export function MateriasPage() {
                 <option value="10+">10+ créditos</option>
               </select>
             </div>
-            <div className="col-md-2">
+
+            {/* Filtro por estado */}
+            <div className="col-md-1">
+              <label className="form-label">Estado</label>
+              <div className="form-check">
+                <input
+                  className="form-check-input"
+                  type="checkbox"
+                  id="showInactive"
+                  checked={showInactive}
+                  onChange={(e) => {
+                    setShowInactive(e.target.checked)
+                    handleFilterChange()
+                  }}
+                  disabled={isSearching}
+                />
+                <label className="form-check-label" htmlFor="showInactive">
+                  Inactivas
+                </label>
+              </div>
+            </div>
+
+            {/* Botón actualizar */}
+            <div className="col-md-1">
               <label className="form-label">&nbsp;</label>
               <button
                 className="btn btn-outline-secondary w-100"
                 onClick={loadMaterias}
                 disabled={loading}
               >
-                <FunnelIcon className="w-4 h-4 me-1" />
-                Actualizar
+                <FunnelIcon className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -270,13 +368,25 @@ export function MateriasPage() {
                   <BookOpenIcon className="w-16 h-16 text-muted mb-3" />
                   <h4>No se encontraron materias</h4>
                   <p>
-                    {searchTerm ? `No hay materias que coincidan con "${searchTerm}".` : 'No hay materias registradas.'}
+                    {searchTerm ? `No hay materias que coincidan con "${searchTerm}".` : 
+                     hasActiveFilters ? 'No hay materias que coincidan con los filtros aplicados.' :
+                     'No hay materias registradas.'}
                   </p>
-                  {searchTerm && (
-                    <button className="btn btn-outline-primary me-2" onClick={handleClearSearch}>
-                      <i className="bi bi-arrow-left me-2"></i>
-                      Limpiar búsqueda
-                    </button>
+                  {(searchTerm || hasActiveFilters) && (
+                    <div className="mt-3">
+                      {searchTerm && (
+                        <button className="btn btn-outline-primary me-2" onClick={handleClearSearch}>
+                          <i className="bi bi-arrow-left me-2"></i>
+                          Limpiar búsqueda
+                        </button>
+                      )}
+                      {hasActiveFilters && (
+                        <button className="btn btn-outline-warning me-2" onClick={handleClearFilters}>
+                          <XMarkIcon className="w-4 h-4 me-2" />
+                          Limpiar filtros
+                        </button>
+                      )}
+                    </div>
                   )}
                   <button className="btn btn-primary" onClick={handleCreateMateria}>
                     <PlusIcon className="w-4 h-4 me-2" />
@@ -294,6 +404,7 @@ export function MateriasPage() {
                       <i className="bi bi-table me-2"></i>
                       Materias ({totalMaterias})
                       {isSearching && <span className="ms-2 badge bg-info">Resultados de búsqueda</span>}
+                      {hasActiveFilters && <span className="ms-2 badge bg-warning">Filtros aplicados</span>}
                     </h5>
                   </div>
                   <div className="col-md-6 text-end">

@@ -28,6 +28,15 @@ export interface MateriasResponse {
   }
 }
 
+export interface MateriasFilters {
+  page?: number
+  limit?: number
+  activo?: boolean
+  creditos?: '1-3' | '4-6' | '7-9' | '10+'
+  nombre?: string
+  codigo?: string
+}
+
 export const materiasService = {
   // Obtener estadísticas de materias
   getStats: async (): Promise<MateriaStats> => {
@@ -35,12 +44,8 @@ export const materiasService = {
     return response.data.stats
   },
 
-  // Obtener todas las materias con paginación
-  getAll: async (params?: {
-    page?: number
-    limit?: number
-    activo?: boolean
-  }): Promise<MateriasResponse> => {
+  // Obtener todas las materias con paginación y filtros
+  getAll: async (params?: MateriasFilters): Promise<MateriasResponse> => {
     const response = await api.get('/materias', { params })
     return response.data
   },

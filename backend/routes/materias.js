@@ -8,15 +8,41 @@ const router = express.Router();
 
 // Obtener todas las materias
 router.get('/', authenticateToken, validatePagination, (req, res) => {
-    const { page = 1, limit = 20, activo } = req.query;
+    const { page = 1, limit = 20, activo, creditos, nombre, codigo } = req.query;
     const offset = (page - 1) * limit;
 
     let whereConditions = ['1=1'];
     let params = [];
 
+    // Filtro por estado activo/inactivo
     if (activo !== undefined) {
-        whereConditions.push('activo = ?');
+        whereConditions.push('m.activo = ?');
         params.push(activo === 'true' ? 1 : 0);
+    }
+
+    // Filtro por créditos
+    if (creditos) {
+        if (creditos === '1-3') {
+            whereConditions.push('m.creditos BETWEEN 1 AND 3');
+        } else if (creditos === '4-6') {
+            whereConditions.push('m.creditos BETWEEN 4 AND 6');
+        } else if (creditos === '7-9') {
+            whereConditions.push('m.creditos BETWEEN 7 AND 9');
+        } else if (creditos === '10+') {
+            whereConditions.push('m.creditos >= 10');
+        }
+    }
+
+    // Filtro por nombre (búsqueda parcial)
+    if (nombre && nombre.trim()) {
+        whereConditions.push('m.nombre LIKE ?');
+        params.push(`%${nombre.trim()}%`);
+    }
+
+    // Filtro por código (búsqueda parcial)
+    if (codigo && codigo.trim()) {
+        whereConditions.push('m.codigo LIKE ?');
+        params.push(`%${codigo.trim()}%`);
     }
 
     const whereClause = 'WHERE ' + whereConditions.join(' AND ');
@@ -36,15 +62,16 @@ router.get('/', authenticateToken, validatePagination, (req, res) => {
     ORDER BY m.nombre
     LIMIT ? OFFSET ?
   `;
+    console.log(query);
 
     params.push(limit, offset);
 
     db.all(query, params, (err, materias) => {
         if (err) {
-            return res.status(500).json({ error: 'Error interno del servidor' });
+            return res.status(500).json({ error: 'Error interno del servidor:' + err });
         }
 
-        // Contar total de materias
+        // Contar total de materias con los mismos filtros
         const countQuery = `
       SELECT COUNT(*) as total
       FROM materias m
