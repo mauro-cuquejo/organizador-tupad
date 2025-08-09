@@ -16,7 +16,8 @@ import {
   SunIcon,
   Bars3Icon,
   XMarkIcon,
-  ChevronDownIcon
+  ChevronDownIcon,
+  ChevronUpIcon
 } from '@heroicons/react/24/outline'
 
 export function Header() {
@@ -158,7 +159,11 @@ export function Header() {
                     >
                       <UserCircleIcon className="w-5 h-5 me-1" />
                       {user?.nombre} {user?.apellido}
-                      <ChevronDownIcon className="w-4 h-4 ms-1" />
+                      {isUserMenuOpen ? (
+                        <ChevronUpIcon className="w-4 h-4 ms-1" />
+                      ) : (
+                        <ChevronDownIcon className="w-4 h-4 ms-1" />
+                      )}
                     </button>
                     {isUserMenuOpen && (
                       <div className="dropdown-menu dropdown-menu-end position-absolute show">
@@ -218,7 +223,11 @@ export function Header() {
               >
                 <UserCircleIcon className="w-5 h-5 me-1" />
                 {user?.nombre} {user?.apellido}
-                <ChevronDownIcon className="w-4 h-4 ms-1" />
+                {isUserMenuOpen ? (
+                  <ChevronUpIcon className="w-4 h-4 ms-1" />
+                ) : (
+                  <ChevronDownIcon className="w-4 h-4 ms-1" />
+                )}
               </button>
               {isUserMenuOpen && (
                 <div className="dropdown-menu dropdown-menu-end position-absolute show">
