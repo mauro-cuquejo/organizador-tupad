@@ -91,37 +91,60 @@ export function MateriasPage() {
   return (
     <div className="materias-page">
       {/* Header */}
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <div>
-          <h1 className="h3 mb-0">
-            <BookOpenIcon className="w-6 h-6 me-2" />
-            Materias
-          </h1>
-          <p className="text-muted mb-0">
-            Gestiona las materias del sistema ({totalMaterias} total)
-          </p>
-        </div>
-        <div>
-          <button
-            className="btn btn-primary"
-            onClick={handleCreateMateria}
-          >
-            <PlusIcon className="w-4 h-4 me-2" />
-            Nueva Materia
-          </button>
+      <div className="page-header">
+        <div className="row align-items-center">
+          <div className="col-md-6">
+            <h1 className="page-title">
+              <BookOpenIcon className="w-8 h-8 me-2" />
+              Gestión de Materias
+            </h1>
+            <p className="page-subtitle">
+              Administra las materias académicas ({totalMaterias} total)
+            </p>
+          </div>
+          <div className="col-md-6 text-end">
+            <button
+              className="btn btn-light me-2"
+              onClick={handleCreateMateria}
+            >
+              <PlusIcon className="w-4 h-4 me-2" />
+              Nueva Materia
+            </button>
+            <button
+              className="btn btn-outline-light me-2"
+              onClick={() => toast.success('Función de exportar - En desarrollo')}
+            >
+              <i className="bi bi-download me-2"></i>
+              Exportar
+            </button>
+            <button
+              className="btn btn-outline-light"
+              onClick={() => toast.success('Función de importar - En desarrollo')}
+            >
+              <i className="bi bi-upload me-2"></i>
+              Importar
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Filtros y Búsqueda */}
-      <div className="card mb-4">
+      <div className="card filters-card mb-4">
+        <div className="card-header">
+          <h5 className="card-title mb-0">
+            <FunnelIcon className="w-5 h-5 me-2" />
+            Filtros de Búsqueda
+          </h5>
+        </div>
         <div className="card-body">
           <div className="row g-3">
-            <div className="col-md-6">
+            <div className="col-md-4">
+              <label className="form-label">Nombre</label>
               <div className="input-group">
                 <input
                   type="text"
                   className="form-control"
-                  placeholder="Buscar materias..."
+                  placeholder="Buscar por nombre..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
@@ -136,6 +159,7 @@ export function MateriasPage() {
               </div>
             </div>
             <div className="col-md-3">
+              <label className="form-label">Estado</label>
               <div className="form-check">
                 <input
                   className="form-check-input"
@@ -149,9 +173,20 @@ export function MateriasPage() {
                 </label>
               </div>
             </div>
-            <div className="col-md-3 text-end">
+            <div className="col-md-3">
+              <label className="form-label">Créditos</label>
+              <select className="form-select">
+                <option value="">Todos</option>
+                <option value="1-3">1-3 créditos</option>
+                <option value="4-6">4-6 créditos</option>
+                <option value="7-9">7-9 créditos</option>
+                <option value="10+">10+ créditos</option>
+              </select>
+            </div>
+            <div className="col-md-2">
+              <label className="form-label">&nbsp;</label>
               <button
-                className="btn btn-outline-secondary"
+                className="btn btn-outline-secondary w-100"
                 onClick={loadMaterias}
                 disabled={loading}
               >
@@ -177,23 +212,60 @@ export function MateriasPage() {
       {!loading && (
         <>
           {materias.length === 0 ? (
-            <div className="text-center py-5">
-              <BookOpenIcon className="w-12 h-12 text-muted mb-3" />
-              <h5>No se encontraron materias</h5>
-              <p className="text-muted">
-                {searchTerm ? 'No hay materias que coincidan con tu búsqueda.' : 'No hay materias registradas.'}
-              </p>
+            <div className="card">
+              <div className="card-body">
+                <div className="empty-state">
+                  <BookOpenIcon className="w-16 h-16 text-muted mb-3" />
+                  <h4>No se encontraron materias</h4>
+                  <p>
+                    {searchTerm ? 'No hay materias que coincidan con tu búsqueda.' : 'No hay materias registradas.'}
+                  </p>
+                  <button className="btn btn-primary" onClick={handleCreateMateria}>
+                    <PlusIcon className="w-4 h-4 me-2" />
+                    Crear primera materia
+                  </button>
+                </div>
+              </div>
             </div>
           ) : (
             <div className="card">
+              <div className="card-header">
+                <div className="row align-items-center">
+                  <div className="col-md-6">
+                    <h5 className="card-title mb-0">
+                      <i className="bi bi-table me-2"></i>
+                      Materias ({totalMaterias})
+                    </h5>
+                  </div>
+                  <div className="col-md-6 text-end">
+                    <div className="btn-group" role="group">
+                      <button
+                        className="btn btn-outline-secondary"
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                        disabled={currentPage === 1}
+                      >
+                        <i className="bi bi-chevron-left"></i>
+                      </button>
+                      <button className="btn btn-outline-primary" disabled>
+                        Página {currentPage} de {totalPages}
+                      </button>
+                      <button
+                        className="btn btn-outline-secondary"
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        disabled={currentPage >= totalPages}
+                      >
+                        <i className="bi bi-chevron-right"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
               <div className="card-body p-0">
                 <div className="table-responsive">
                   <table className="table table-hover mb-0">
                     <thead className="table-light">
                       <tr>
-                        <th>Código</th>
-                        <th>Nombre</th>
-                        <th>Descripción</th>
+                        <th>Materia</th>
                         <th>Créditos</th>
                         <th>Estado</th>
                         <th>Acciones</th>
@@ -201,20 +273,25 @@ export function MateriasPage() {
                     </thead>
                     <tbody>
                       {materias.map((materia) => (
-                        <tr key={materia.id}>
+                        <tr key={materia.id} className="materia-row">
                           <td>
-                            <strong>{materia.codigo}</strong>
+                            <div className="d-flex align-items-center">
+                              <div className="materia-icon me-3">
+                                <BookOpenIcon className="w-5 h-5" />
+                              </div>
+                              <div>
+                                <div className="fw-bold">{materia.nombre}</div>
+                                <small className="text-muted">{materia.codigo}</small>
+                                {materia.descripcion && (
+                                  <div className="text-truncate-2 text-muted mt-1">
+                                    {materia.descripcion}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
                           </td>
-                          <td>{materia.nombre}</td>
                           <td>
-                            <span className="text-muted">
-                              {materia.descripcion?.length > 50
-                                ? `${materia.descripcion.substring(0, 50)}...`
-                                : materia.descripcion || 'Sin descripción'}
-                            </span>
-                          </td>
-                          <td>
-                            <span className="badge bg-info">{materia.creditos}</span>
+                            <span className="badge bg-info">{materia.creditos} créditos</span>
                           </td>
                           <td>
                             <span className={`badge ${materia.activo ? 'bg-success' : 'bg-secondary'}`}>
@@ -266,13 +343,22 @@ export function MateriasPage() {
                 <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
                   <button
                     className="page-link"
+                    onClick={() => setCurrentPage(1)}
+                    disabled={currentPage === 1}
+                  >
+                    <i className="bi bi-chevron-double-left"></i>
+                  </button>
+                </li>
+                <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                  <button
+                    className="page-link"
                     onClick={() => setCurrentPage(currentPage - 1)}
                     disabled={currentPage === 1}
                   >
-                    Anterior
+                    <i className="bi bi-chevron-left"></i>
                   </button>
                 </li>
-
+                
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                   <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
                     <button
@@ -283,14 +369,23 @@ export function MateriasPage() {
                     </button>
                   </li>
                 ))}
-
+                
                 <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
                   <button
                     className="page-link"
                     onClick={() => setCurrentPage(currentPage + 1)}
                     disabled={currentPage === totalPages}
                   >
-                    Siguiente
+                    <i className="bi bi-chevron-right"></i>
+                  </button>
+                </li>
+                <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                  <button
+                    className="page-link"
+                    onClick={() => setCurrentPage(totalPages)}
+                    disabled={currentPage === totalPages}
+                  >
+                    <i className="bi bi-chevron-double-right"></i>
                   </button>
                 </li>
               </ul>
