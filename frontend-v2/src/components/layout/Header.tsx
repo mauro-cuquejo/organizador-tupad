@@ -31,7 +31,6 @@ export function Header() {
     { path: '/dashboard', icon: HomeIcon, label: 'Dashboard' },
     { path: '/horarios', icon: CalendarIcon, label: 'Horarios' },
     { path: '/materias', icon: BookOpenIcon, label: 'Materias' },
-    { path: '/contenidos', icon: DocumentTextIcon, label: 'Contenidos' },
     { path: '/evaluaciones', icon: ClipboardDocumentCheckIcon, label: 'Evaluaciones' },
     { path: '/notificaciones', icon: BellIcon, label: 'Notificaciones' },
   ]

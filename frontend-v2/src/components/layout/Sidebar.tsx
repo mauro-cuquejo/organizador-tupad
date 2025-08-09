@@ -15,7 +15,6 @@ const navigation = [
   { name: 'Materias', href: '/materias', icon: BookOpenIcon },
   { name: 'Horarios', href: '/horarios', icon: ClockIcon },
   { name: 'Profesores', href: '/profesores', icon: UserGroupIcon },
-  { name: 'Contenidos', href: '/contenidos', icon: DocumentTextIcon },
   { name: 'Estadísticas', href: '/estadisticas', icon: ChartBarIcon },
   { name: 'Notificaciones', href: '/notificaciones', icon: BellIcon },
 ]
