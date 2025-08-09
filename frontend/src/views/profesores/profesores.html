@@ -1,0 +1,401 @@
+<div class="profesores-page">
+    <!-- Header -->
+    <div class="page-header mb-4">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h1 class="page-title">
+                    <i class="bi bi-person-badge"></i>
+                    Gestión de Profesores
+                </h1>
+                <p class="page-subtitle">Administra el personal académico</p>
+            </div>
+            <div class="col-md-6 text-end">
+                <button class="btn btn-primary me-2" ng-click="profesoresCtrl.openModal()">
+                    <i class="bi bi-plus-circle"></i>
+                    Nuevo Profesor
+                </button>
+                <button class="btn btn-outline-secondary me-2" ng-click="profesoresCtrl.exportProfesores()">
+                    <i class="bi bi-download"></i>
+                    Exportar
+                </button>
+                <button class="btn btn-outline-info" ng-click="profesoresCtrl.importProfesores()">
+                    <i class="bi bi-upload"></i>
+                    Importar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">
+                <i class="bi bi-funnel"></i>
+                Filtros de Búsqueda
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-2 mb-3">
+                    <label class="form-label">Nombre</label>
+                    <input type="text" class="form-control" ng-model="profesoresCtrl.filters.nombre"
+                        placeholder="Buscar por nombre" ng-change="profesoresCtrl.applyFilters()">
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label class="form-label">Apellido</label>
+                    <input type="text" class="form-control" ng-model="profesoresCtrl.filters.apellido"
+                        placeholder="Buscar por apellido" ng-change="profesoresCtrl.applyFilters()">
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" ng-model="profesoresCtrl.filters.email"
+                        placeholder="Buscar por email" ng-change="profesoresCtrl.applyFilters()">
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label class="form-label">Especialidad</label>
+                    <input type="text" class="form-control" ng-model="profesoresCtrl.filters.especialidad"
+                        placeholder="Buscar por especialidad" ng-change="profesoresCtrl.applyFilters()">
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label class="form-label">Estado</label>
+                    <select class="form-select" ng-model="profesoresCtrl.filters.estado"
+                        ng-change="profesoresCtrl.applyFilters()">
+                        <option value="">Todos los estados</option>
+                        <option ng-repeat="estado in profesoresCtrl.estados" value="{{ estado.value }}">
+                            {{ estado.label }}
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label class="form-label">&nbsp;</label>
+                    <button class="btn btn-outline-secondary w-100" ng-click="profesoresCtrl.clearFilters()">
+                        <i class="bi bi-x-circle"></i>
+                        Limpiar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div ng-if="profesoresCtrl.loading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+        </div>
+        <p class="mt-3 text-muted">Cargando profesores...</p>
+    </div>
+
+    <!-- Tabla de Profesores -->
+    <div class="card" ng-if="!profesoresCtrl.loading">
+        <div class="card-header">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-table"></i>
+                        Profesores ({{ profesoresCtrl.totalItems }})
+                    </h5>
+                </div>
+                <div class="col-md-6 text-end">
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-outline-secondary"
+                            ng-click="profesoresCtrl.changePage(profesoresCtrl.currentPage - 1)"
+                            ng-disabled="profesoresCtrl.currentPage === 1">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <button class="btn btn-outline-primary" disabled>
+                            Página {{ profesoresCtrl.currentPage }} de {{ profesoresCtrl.getTotalPages() }}
+                        </button>
+                        <button class="btn btn-outline-secondary"
+                            ng-click="profesoresCtrl.changePage(profesoresCtrl.currentPage + 1)"
+                            ng-disabled="profesoresCtrl.currentPage >= profesoresCtrl.getTotalPages()">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Profesor</th>
+                            <th>Contacto</th>
+                            <th>Especialidad</th>
+                            <th>Departamento</th>
+                            <th>Experiencia</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-if="profesoresCtrl.profesores.length === 0">
+                            <td colspan="7" class="text-center py-4">
+                                <div class="empty-state">
+                                    <i class="bi bi-person-x"></i>
+                                    <h4>No hay profesores</h4>
+                                    <p>No se encontraron profesores con los filtros aplicados</p>
+                                    <button class="btn btn-primary" ng-click="profesoresCtrl.openModal()">
+                                        <i class="bi bi-plus-circle"></i>
+                                        Crear primer profesor
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr ng-repeat="profesor in profesoresCtrl.profesores" class="profesor-row">
+                            <td>
+                                <user-avatar name="{{ profesor.nombre }} {{ profesor.apellido }}" size="md"
+                                    show-name="false"></user-avatar>
+                                <div class="mt-2">
+                                    <div ng-if="profesor.titulo" class="text-muted">
+                                        {{ profesor.titulo }}
+                                    </div>
+                                    <div ng-if="profesor.oficina" class="mt-1">
+                                        <small class="text-muted">
+                                            <i class="bi bi-geo-alt"></i>
+                                            {{ profesor.oficina }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="contact-info">
+                                    <div ng-if="profesor.email">
+                                        <a href="mailto:{{ profesor.email }}" class="text-decoration-none">
+                                            <i class="bi bi-envelope"></i>
+                                            {{ profesor.email }}
+                                        </a>
+                                    </div>
+                                    <div ng-if="profesor.telefono" class="mt-1">
+                                        <a href="tel:{{ profesor.telefono }}" class="text-decoration-none">
+                                            <i class="bi bi-telephone"></i>
+                                            {{ profesor.telefono }}
+                                        </a>
+                                    </div>
+                                    <div ng-if="profesor.horario_consultas" class="mt-1">
+                                        <small class="text-muted">
+                                            <i class="bi bi-clock"></i>
+                                            {{ profesor.horario_consultas }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark">
+                                    {{ profesor.especialidad }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge"
+                                    ng-class="'bg-' + profesoresCtrl.getDepartamentoColor(profesor.departamento)">
+                                    {{ profesor.departamento }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="experience-info">
+                                    <div class="fw-bold">{{ profesoresCtrl.getAniosExperiencia(profesor) }}</div>
+                                    <div ng-if="profesor.fecha_contratacion" class="mt-1">
+                                        <small class="text-muted">
+                                            Desde: {{ profesoresCtrl.formatDate(profesor.fecha_contratacion) }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge" ng-class="'bg-' + profesoresCtrl.getEstadoColor(profesor.estado)">
+                                    {{ profesor.estado }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <button class="btn btn-outline-success"
+                                        ng-click="profesoresCtrl.sendEmail(profesor)" title="Enviar email"
+                                        ng-if="profesor.email">
+                                        <i class="bi bi-envelope"></i>
+                                    </button>
+                                    <button class="btn btn-outline-info" ng-click="profesoresCtrl.callPhone(profesor)"
+                                        title="Llamar" ng-if="profesor.telefono">
+                                        <i class="bi bi-telephone"></i>
+                                    </button>
+                                    <button class="btn btn-outline-info" ng-click="profesoresCtrl.viewDetails(profesor)"
+                                        title="Ver detalles">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    <button class="btn btn-outline-primary"
+                                        ng-click="profesoresCtrl.openModal(profesor)" title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-outline-danger"
+                                        ng-click="profesoresCtrl.deleteProfesor(profesor)" title="Eliminar">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Paginación -->
+        <div class="card-footer" ng-if="profesoresCtrl.getTotalPages() > 1">
+            <nav aria-label="Navegación de páginas">
+                <ul class="pagination justify-content-center mb-0">
+                    <li class="page-item" ng-class="{ disabled: profesoresCtrl.currentPage === 1 }">
+                        <a class="page-link" href="#" ng-click="profesoresCtrl.changePage(1)">
+                            <i class="bi bi-chevron-double-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item" ng-class="{ disabled: profesoresCtrl.currentPage === 1 }">
+                        <a class="page-link" href="#"
+                            ng-click="profesoresCtrl.changePage(profesoresCtrl.currentPage - 1)">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+
+                    <li class="page-item" ng-repeat="page in profesoresCtrl.getPageRange()"
+                        ng-class="{ active: page === profesoresCtrl.currentPage }">
+                        <a class="page-link" href="#" ng-click="profesoresCtrl.changePage(page)">
+                            {{ page }}
+                        </a>
+                    </li>
+
+                    <li class="page-item"
+                        ng-class="{ disabled: profesoresCtrl.currentPage >= profesoresCtrl.getTotalPages() }">
+                        <a class="page-link" href="#"
+                            ng-click="profesoresCtrl.changePage(profesoresCtrl.currentPage + 1)">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item"
+                        ng-class="{ disabled: profesoresCtrl.currentPage >= profesoresCtrl.getTotalPages() }">
+                        <a class="page-link" href="#"
+                            ng-click="profesoresCtrl.changePage(profesoresCtrl.getTotalPages())">
+                            <i class="bi bi-chevron-double-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Modal para Crear/Editar Profesor -->
+    <div class="modal fade" id="profesorModal" tabindex="-1" ng-show="profesoresCtrl.showModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi" ng-class="profesoresCtrl.editMode ? 'bi-pencil' : 'bi-plus-circle'"></i>
+                        {{ profesoresCtrl.editMode ? 'Editar' : 'Nuevo' }} Profesor
+                    </h5>
+                    <button type="button" class="btn-close" ng-click="profesoresCtrl.closeModal()"></button>
+                </div>
+                <form ng-submit="profesoresCtrl.saveProfesor()">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Nombre *</label>
+                                <input type="text" class="form-control" ng-model="profesoresCtrl.profesorForm.nombre"
+                                    placeholder="Nombre del profesor" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Apellido *</label>
+                                <input type="text" class="form-control" ng-model="profesoresCtrl.profesorForm.apellido"
+                                    placeholder="Apellido del profesor" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Email *</label>
+                                <input type="email" class="form-control" ng-model="profesoresCtrl.profesorForm.email"
+                                    placeholder="profesor@universidad.edu" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Teléfono</label>
+                                <input type="tel" class="form-control" ng-model="profesoresCtrl.profesorForm.telefono"
+                                    placeholder="+1234567890">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Especialidad *</label>
+                                <input type="text" class="form-control"
+                                    ng-model="profesoresCtrl.profesorForm.especialidad"
+                                    placeholder="Ej: Programación Web, Matemáticas" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Título Académico</label>
+                                <select class="form-select" ng-model="profesoresCtrl.profesorForm.titulo">
+                                    <option value="">Seleccionar título</option>
+                                    <option ng-repeat="titulo in profesoresCtrl.titulos" value="{{ titulo.value }}">
+                                        {{ titulo.label }}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Departamento</label>
+                                <select class="form-select" ng-model="profesoresCtrl.profesorForm.departamento">
+                                    <option value="">Seleccionar departamento</option>
+                                    <option ng-repeat="departamento in profesoresCtrl.departamentos"
+                                        value="{{ departamento.value }}">
+                                        {{ departamento.label }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Estado</label>
+                                <select class="form-select" ng-model="profesoresCtrl.profesorForm.estado">
+                                    <option ng-repeat="estado in profesoresCtrl.estados" value="{{ estado.value }}">
+                                        {{ estado.label }}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Fecha de Contratación</label>
+                                <input type="date" class="form-control"
+                                    ng-model="profesoresCtrl.profesorForm.fecha_contratacion">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Oficina</label>
+                                <input type="text" class="form-control" ng-model="profesoresCtrl.profesorForm.oficina"
+                                    placeholder="Ej: Edificio A, Oficina 201">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Horario de Consultas</label>
+                            <input type="text" class="form-control"
+                                ng-model="profesoresCtrl.profesorForm.horario_consultas"
+                                placeholder="Ej: Lunes y Miércoles 14:00-16:00">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Biografía</label>
+                            <textarea class="form-control" ng-model="profesoresCtrl.profesorForm.biografia" rows="4"
+                                placeholder="Breve biografía del profesor"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Observaciones</label>
+                            <textarea class="form-control" ng-model="profesoresCtrl.profesorForm.observaciones" rows="3"
+                                placeholder="Observaciones adicionales"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" ng-click="profesoresCtrl.closeModal()">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary" ng-disabled="profesoresCtrl.loading">
+                            <span ng-if="profesoresCtrl.loading" class="spinner-border spinner-border-sm me-2"></span>
+                            <i ng-if="!profesoresCtrl.loading" class="bi"
+                                ng-class="profesoresCtrl.editMode ? 'bi-check' : 'bi-plus'"></i>
+                            {{ profesoresCtrl.loading ? 'Guardando...' : (profesoresCtrl.editMode ? 'Actualizar' :
+                            'Crear') }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

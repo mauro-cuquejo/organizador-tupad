@@ -1,0 +1,523 @@
+/**
+ * Estilos para gestión de temas (modo oscuro/claro)
+ */
+
+/* Variables CSS por defecto (modo claro) */
+:root {
+    /* Colores principales */
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+
+    /* Fondos */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --bg-tertiary: #e9ecef;
+    --bg-card: #ffffff;
+    --bg-sidebar: #f8f9fa;
+    --bg-modal: #ffffff;
+    --bg-dropdown: #ffffff;
+    --bg-tooltip: #212529;
+
+    /* Textos */
+    --text-primary: #212529;
+    --text-secondary: #6c757d;
+    --text-muted: #6c757d;
+    --text-light: #ffffff;
+    --text-dark: #212529;
+
+    /* Bordes */
+    --border-color: #dee2e6;
+    --border-light: #e9ecef;
+    --border-dark: #adb5bd;
+
+    /* Sombras */
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --shadow-sm: 0 0.125rem 0.25rem var(--shadow-color);
+    --shadow: 0 0.5rem 1rem var(--shadow-color);
+    --shadow-lg: 0 1rem 3rem var(--shadow-color);
+
+    /* Overlays */
+    --overlay-color: rgba(0, 0, 0, 0.5);
+    --overlay-light: rgba(0, 0, 0, 0.1);
+
+    /* Estados */
+    --hover-bg: #f8f9fa;
+    --active-bg: #e9ecef;
+    --focus-ring: rgba(0, 123, 255, 0.25);
+
+    /* Transiciones */
+    --transition-speed: 0.15s;
+    --transition-timing: ease-in-out;
+}
+
+/* Tema oscuro */
+.theme-dark {
+    /* Colores principales */
+    --primary-color: #4a90e2;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+
+    /* Fondos */
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2d2d2d;
+    --bg-tertiary: #3d3d3d;
+    --bg-card: #2a2a2a;
+    --bg-sidebar: #1f1f1f;
+    --bg-modal: #2a2a2a;
+    --bg-dropdown: #2a2a2a;
+    --bg-tooltip: #1a1a1a;
+
+    /* Textos */
+    --text-primary: #ffffff;
+    --text-secondary: #b0b0b0;
+    --text-muted: #888888;
+    --text-light: #ffffff;
+    --text-dark: #e9ecef;
+
+    /* Bordes */
+    --border-color: #404040;
+    --border-light: #333333;
+    --border-dark: #555555;
+
+    /* Sombras */
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    --shadow-sm: 0 0.125rem 0.25rem var(--shadow-color);
+    --shadow: 0 0.5rem 1rem var(--shadow-color);
+    --shadow-lg: 0 1rem 3rem var(--shadow-color);
+
+    /* Overlays */
+    --overlay-color: rgba(0, 0, 0, 0.7);
+    --overlay-light: rgba(0, 0, 0, 0.2);
+
+    /* Estados */
+    --hover-bg: #3d3d3d;
+    --active-bg: #404040;
+    --focus-ring: rgba(74, 144, 226, 0.25);
+}
+
+/* Aplicar variables CSS a elementos Bootstrap */
+.theme-dark body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.theme-dark .navbar {
+    background-color: var(--bg-secondary) !important;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.theme-dark .navbar-brand,
+.theme-dark .navbar-nav .nav-link {
+    color: var(--text-primary) !important;
+}
+
+.theme-dark .navbar-nav .nav-link:hover {
+    color: var(--primary-color) !important;
+}
+
+.theme-dark .card {
+    background-color: var(--bg-card);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.theme-dark .card-header {
+    background-color: var(--bg-secondary);
+    border-bottom-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.theme-dark .card-footer {
+    background-color: var(--bg-secondary);
+    border-top-color: var(--border-color);
+}
+
+.theme-dark .table {
+    color: var(--text-primary);
+}
+
+.theme-dark .table th {
+    background-color: var(--bg-secondary);
+    border-bottom-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.theme-dark .table td {
+    border-top-color: var(--border-color);
+}
+
+.theme-dark .table-striped > tbody > tr:nth-of-type(odd) > td {
+    background-color: var(--bg-tertiary);
+}
+
+.theme-dark .table-hover > tbody > tr:hover > td {
+    background-color: var(--hover-bg);
+}
+
+.theme-dark .form-control {
+    background-color: var(--bg-secondary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.theme-dark .form-control:focus {
+    background-color: var(--bg-secondary);
+    border-color: var(--primary-color);
+    color: var(--text-primary);
+    box-shadow: 0 0 0 0.2rem var(--focus-ring);
+}
+
+.theme-dark .form-control::placeholder {
+    color: var(--text-muted);
+}
+
+.theme-dark .form-select {
+    background-color: var(--bg-secondary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.theme-dark .form-select:focus {
+    background-color: var(--bg-secondary);
+    border-color: var(--primary-color);
+    color: var(--text-primary);
+    box-shadow: 0 0 0 0.2rem var(--focus-ring);
+}
+
+.theme-dark .dropdown-menu {
+    background-color: var(--bg-dropdown);
+    border-color: var(--border-color);
+}
+
+.theme-dark .dropdown-item {
+    color: var(--text-primary);
+}
+
+.theme-dark .dropdown-item:hover {
+    background-color: var(--hover-bg);
+    color: var(--text-primary);
+}
+
+.theme-dark .modal-content {
+    background-color: var(--bg-modal);
+    border-color: var(--border-color);
+}
+
+.theme-dark .modal-header {
+    border-bottom-color: var(--border-color);
+}
+
+.theme-dark .modal-footer {
+    border-top-color: var(--border-color);
+}
+
+.theme-dark .btn-close {
+    filter: invert(1);
+}
+
+.theme-dark .list-group-item {
+    background-color: var(--bg-card);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.theme-dark .list-group-item:hover {
+    background-color: var(--hover-bg);
+}
+
+.theme-dark .alert {
+    border-color: var(--border-color);
+}
+
+.theme-dark .alert-info {
+    background-color: rgba(23, 162, 184, 0.1);
+    color: var(--info-color);
+}
+
+.theme-dark .alert-success {
+    background-color: rgba(40, 167, 69, 0.1);
+    color: var(--success-color);
+}
+
+.theme-dark .alert-warning {
+    background-color: rgba(255, 193, 7, 0.1);
+    color: var(--warning-color);
+}
+
+.theme-dark .alert-danger {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: var(--danger-color);
+}
+
+.theme-dark .badge {
+    color: var(--text-light);
+}
+
+.theme-dark .text-muted {
+    color: var(--text-muted) !important;
+}
+
+.theme-dark .text-secondary {
+    color: var(--text-secondary) !important;
+}
+
+.theme-dark .border {
+    border-color: var(--border-color) !important;
+}
+
+.theme-dark .border-top {
+    border-top-color: var(--border-color) !important;
+}
+
+.theme-dark .border-bottom {
+    border-bottom-color: var(--border-color) !important;
+}
+
+.theme-dark .border-start {
+    border-left-color: var(--border-color) !important;
+}
+
+.theme-dark .border-end {
+    border-right-color: var(--border-color) !important;
+}
+
+/* Sidebar específico */
+.theme-dark .sidebar {
+    background-color: var(--bg-sidebar);
+    border-right: 1px solid var(--border-color);
+}
+
+.theme-dark .sidebar .nav-link {
+    color: var(--text-secondary);
+}
+
+.theme-dark .sidebar .nav-link:hover {
+    background-color: var(--hover-bg);
+    color: var(--text-primary);
+}
+
+.theme-dark .sidebar .nav-link.active {
+    background-color: var(--primary-color);
+    color: var(--text-light);
+}
+
+/* Tooltips */
+.theme-dark .tooltip .tooltip-inner {
+    background-color: var(--bg-tooltip);
+    color: var(--text-light);
+}
+
+.theme-dark .tooltip .tooltip-arrow::before {
+    border-top-color: var(--bg-tooltip);
+}
+
+/* Scrollbar personalizada */
+.theme-dark ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.theme-dark ::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+}
+
+.theme-dark ::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+.theme-dark ::-webkit-scrollbar-thumb:hover {
+    background: var(--border-dark);
+}
+
+/* Transiciones suaves */
+* {
+    transition: background-color var(--transition-speed) var(--transition-timing),
+                color var(--transition-speed) var(--transition-timing),
+                border-color var(--transition-speed) var(--transition-timing),
+                box-shadow var(--transition-speed) var(--transition-timing);
+}
+
+/* Excepciones para elementos que no deben transicionar */
+.no-transition,
+.no-transition * {
+    transition: none !important;
+}
+
+/* Estados de carga */
+.theme-dark .loading-overlay {
+    background-color: var(--overlay-color);
+}
+
+.theme-dark .spinner-border {
+    color: var(--primary-color);
+}
+
+/* Mejoras para formularios */
+.theme-dark .input-group-text {
+    background-color: var(--bg-tertiary);
+    border-color: var(--border-color);
+    color: var(--text-secondary);
+}
+
+.theme-dark .form-check-input {
+    background-color: var(--bg-secondary);
+    border-color: var(--border-color);
+}
+
+.theme-dark .form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.theme-dark .form-check-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem var(--focus-ring);
+}
+
+/* Mejoras para botones */
+.theme-dark .btn-outline-secondary {
+    color: var(--text-secondary);
+    border-color: var(--border-color);
+}
+
+.theme-dark .btn-outline-secondary:hover {
+    background-color: var(--text-secondary);
+    border-color: var(--text-secondary);
+    color: var(--text-light);
+}
+
+/* Mejoras para paginación */
+.theme-dark .page-link {
+    background-color: var(--bg-card);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.theme-dark .page-link:hover {
+    background-color: var(--hover-bg);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.theme-dark .page-item.active .page-link {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* Mejoras para tabs */
+.theme-dark .nav-tabs {
+    border-bottom-color: var(--border-color);
+}
+
+.theme-dark .nav-tabs .nav-link {
+    color: var(--text-secondary);
+    border-color: transparent;
+}
+
+.theme-dark .nav-tabs .nav-link:hover {
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.theme-dark .nav-tabs .nav-link.active {
+    background-color: var(--bg-card);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+/* Mejoras para accordion */
+.theme-dark .accordion-item {
+    background-color: var(--bg-card);
+    border-color: var(--border-color);
+}
+
+.theme-dark .accordion-button {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.theme-dark .accordion-button:not(.collapsed) {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.theme-dark .accordion-button:focus {
+    box-shadow: 0 0 0 0.2rem var(--focus-ring);
+}
+
+.theme-dark .accordion-button::after {
+    filter: invert(1);
+}
+
+/* Mejoras para breadcrumb */
+.theme-dark .breadcrumb-item + .breadcrumb-item::before {
+    color: var(--text-muted);
+}
+
+/* Mejoras para progress */
+.theme-dark .progress {
+    background-color: var(--bg-tertiary);
+}
+
+/* Mejoras para badges personalizados */
+.theme-dark .badge.bg-light {
+    background-color: var(--bg-tertiary) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Mejoras para código */
+.theme-dark code {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.theme-dark pre {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+/* Mejoras para blockquotes */
+.theme-dark blockquote {
+    border-left-color: var(--border-color);
+    color: var(--text-secondary);
+}
+
+/* Mejoras para hr */
+.theme-dark hr {
+    border-color: var(--border-color);
+}
+
+/* Mejoras para imágenes */
+.theme-dark img {
+    filter: brightness(0.9) contrast(1.1);
+}
+
+/* Mejoras para enlaces */
+.theme-dark a {
+    color: var(--primary-color);
+}
+
+.theme-dark a:hover {
+    color: var(--primary-color);
+    opacity: 0.8;
+}
+
+/* Mejoras para texto seleccionado */
+.theme-dark ::selection {
+    background-color: var(--primary-color);
+    color: var(--text-light);
+}
+
+.theme-dark ::-moz-selection {
+    background-color: var(--primary-color);
+    color: var(--text-light);
+}

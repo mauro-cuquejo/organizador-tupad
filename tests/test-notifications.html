@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Notificaciones</title>
+</head>
+
+<body>
+    <h1>Test de Notificaciones</h1>
+    <button onclick="testHealth()">Test Health</button>
+    <button onclick="testNotifications()">Test Notificaciones</button>
+    <div id="results"></div>
+
+    <script>
+        function log(message) {
+            const results = document.getElementById('results');
+            results.innerHTML += '<p>' + new Date().toLocaleTimeString() + ': ' + message + '</p>';
+        }
+
+        async function testHealth() {
+            try {
+                log('🔍 Probando endpoint de salud...');
+                const response = await fetch('http://localhost:3000/api/health');
+                const data = await response.json();
+                log('✅ Health OK: ' + JSON.stringify(data));
+            } catch (error) {
+                log('❌ Error en health: ' + error.message);
+            }
+        }
+
+        async function testNotifications() {
+            try {
+                log('🔍 Probando endpoint de notificaciones...');
+
+                // Primero hacer login para obtener un token válido
+                const loginData = {
+                    email: 'admin@tupad.edu.ar',
+                    password: 'AdminTupad2024!'
+                };
+
+                const loginResponse = await fetch('http://localhost:3000/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(loginData)
+                });
+
+                if (!loginResponse.ok) {
+                    log('❌ Error al hacer login para obtener token', 'error');
+                    return;
+                }
+
+                const loginResult = await loginResponse.json();
+                const token = loginResult.token;
+
+                log(`✅ Login exitoso, token obtenido: ${token.substring(0, 20)}...`, 'success');
+
+                // Ahora probar notificaciones con el token válido
+                const response = await fetch('http://localhost:3000/api/notificaciones/check', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    log('✅ Notificaciones OK: ' + JSON.stringify(data));
+                } else {
+                    const errorText = await response.text();
+                    log('❌ Error en notificaciones: ' + response.status + ' - ' + errorText);
+                }
+            } catch (error) {
+                log('❌ Error en notificaciones: ' + error.message);
+            }
+        }
+
+        // Test automático al cargar
+        window.onload = function () {
+            log('🚀 Página cargada, iniciando tests...');
+            setTimeout(testHealth, 1000);
+            setTimeout(testNotifications, 2000);
+        };
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,179 @@
+<div class="auth-page">
+    <div class="auth-container">
+        <div class="auth-card">
+            <!-- Logo y título -->
+            <div class="auth-header text-center mb-4">
+                <div class="auth-logo">
+                    <i class="bi bi-person-plus-fill"></i>
+                </div>
+                <h2 class="auth-title">Crear Cuenta</h2>
+                <p class="auth-subtitle">Únete a TUPAD Organizador</p>
+            </div>
+
+            <!-- Formulario de registro -->
+            <form name="registerForm" ng-submit="registerCtrl.register()" novalidate>
+                <!-- Nombre -->
+                <div class="form-group mb-3">
+                    <label for="nombre" class="form-label">
+                        <i class="bi bi-person"></i> Nombre
+                    </label>
+                    <input type="text" id="nombre" name="nombre" class="form-control"
+                        ng-model="registerCtrl.formData.nombre"
+                        ng-class="{'is-invalid': registerForm.nombre.$touched && registerForm.nombre.$invalid}"
+                        placeholder="Tu nombre" required>
+                    <div class="invalid-feedback"
+                        ng-show="registerForm.nombre.$touched && registerForm.nombre.$invalid">
+                        <span ng-show="registerForm.nombre.$error.required">El nombre es requerido</span>
+                    </div>
+                </div>
+
+                <!-- Apellido -->
+                <div class="form-group mb-3">
+                    <label for="apellido" class="form-label">
+                        <i class="bi bi-person"></i> Apellido
+                    </label>
+                    <input type="text" id="apellido" name="apellido" class="form-control"
+                        ng-model="registerCtrl.formData.apellido"
+                        ng-class="{'is-invalid': registerForm.apellido.$touched && registerForm.apellido.$invalid}"
+                        placeholder="Tu apellido" required>
+                    <div class="invalid-feedback"
+                        ng-show="registerForm.apellido.$touched && registerForm.apellido.$invalid">
+                        <span ng-show="registerForm.apellido.$error.required">El apellido es requerido</span>
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="form-group mb-3">
+                    <label for="email" class="form-label">
+                        <i class="bi bi-envelope"></i> Correo Electrónico
+                    </label>
+                    <input type="email" id="email" name="email" class="form-control"
+                        ng-model="registerCtrl.formData.email"
+                        ng-class="{'is-invalid': registerForm.email.$touched && registerForm.email.$invalid}"
+                        placeholder="tu@email.com" required>
+                    <div class="invalid-feedback" ng-show="registerForm.email.$touched && registerForm.email.$invalid">
+                        <span ng-show="registerForm.email.$error.required">El correo electrónico es requerido</span>
+                        <span ng-show="registerForm.email.$error.email">Ingresa un correo electrónico válido</span>
+                    </div>
+                </div>
+
+                <!-- Rol -->
+                <div class="form-group mb-3">
+                    <label for="rol" class="form-label">
+                        <i class="bi bi-person-badge"></i> Rol
+                    </label>
+                    <select id="rol" name="rol" class="form-select" ng-model="registerCtrl.formData.rol" required>
+                        <option ng-repeat="role in registerCtrl.roles" value="{{ role.value }}">
+                            {{ role.label }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Contraseña -->
+                <div class="form-group mb-3">
+                    <label for="password" class="form-label">
+                        <i class="bi bi-lock"></i> Contraseña
+                    </label>
+                    <div class="input-group">
+                        <input type="password" id="password" name="password" class="form-control"
+                            ng-model="registerCtrl.formData.password"
+                            ng-class="{'is-invalid': registerForm.password.$touched && registerForm.password.$invalid}"
+                            placeholder="Tu contraseña" required>
+                        <button class="btn btn-outline-secondary" type="button"
+                            ng-click="registerCtrl.togglePasswordVisibility('password')">
+                            <i class="bi"
+                                ng-class="registerCtrl.registerPasswordVisible ? 'bi-eye-slash' : 'bi-eye'"></i>
+                        </button>
+                    </div>
+                    <div class="invalid-feedback"
+                        ng-show="registerForm.password.$touched && registerForm.password.$invalid">
+                        <span ng-show="registerForm.password.$error.required">La contraseña es requerida</span>
+                        <span ng-show="registerForm.password.$error.minlength">La contraseña debe tener al menos 6
+                            caracteres</span>
+                    </div>
+
+                    <!-- Indicador de fortaleza de contraseña -->
+                    <div class="password-strength mt-2" ng-show="registerCtrl.formData.password">
+                        <div class="progress" style="height: 4px;">
+                            <div class="progress-bar"
+                                ng-class="registerCtrl.getPasswordStrength(registerCtrl.formData.password).class"
+                                ng-style="{'width': (registerCtrl.getPasswordStrength(registerCtrl.formData.password).score / 6) * 100 + '%'}">
+                            </div>
+                        </div>
+                        <small class="text-muted"
+                            ng-class="registerCtrl.getPasswordStrength(registerCtrl.formData.password).class">
+                            Fortaleza: {{ registerCtrl.getPasswordStrength(registerCtrl.formData.password).label }}
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Confirmar Contraseña -->
+                <div class="form-group mb-3">
+                    <label for="confirmPassword" class="form-label">
+                        <i class="bi bi-lock-fill"></i> Confirmar Contraseña
+                    </label>
+                    <div class="input-group">
+                        <input type="password" id="confirmPassword" name="confirmPassword" class="form-control"
+                            ng-model="registerCtrl.formData.confirmPassword"
+                            ng-class="{'is-invalid': registerForm.confirmPassword.$touched && registerCtrl.formData.password !== registerCtrl.formData.confirmPassword}"
+                            placeholder="Confirma tu contraseña" required>
+                        <button class="btn btn-outline-secondary" type="button"
+                            ng-click="registerCtrl.togglePasswordVisibility('confirmPassword')">
+                            <i class="bi"
+                                ng-class="registerCtrl.confirmPasswordVisible ? 'bi-eye-slash' : 'bi-eye'"></i>
+                        </button>
+                    </div>
+                    <div class="invalid-feedback"
+                        ng-show="registerForm.confirmPassword.$touched && registerCtrl.formData.password !== registerCtrl.formData.confirmPassword">
+                        <span>Las contraseñas no coinciden</span>
+                    </div>
+                </div>
+
+                <!-- Términos y condiciones -->
+                <div class="form-group mb-3">
+                    <div class="form-check">
+                        <input type="checkbox" id="terms" name="terms" class="form-check-input"
+                            ng-model="registerCtrl.formData.acceptTerms" required>
+                        <label class="form-check-label" for="terms">
+                            Acepto los <a href="#" class="text-decoration-none">términos y condiciones</a> y la
+                            <a href="#" class="text-decoration-none">política de privacidad</a>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Botón de registro -->
+                <div class="form-group mb-3">
+                    <button type="submit" class="btn btn-primary w-100"
+                        ng-disabled="registerCtrl.loading || registerForm.$invalid || !registerCtrl.formData.acceptTerms">
+                        <span ng-if="registerCtrl.loading" class="spinner-border spinner-border-sm me-2"></span>
+                        <i ng-if="!registerCtrl.loading" class="bi bi-person-plus me-2"></i>
+                        {{ registerCtrl.loading ? 'Creando cuenta...' : 'Crear Cuenta' }}
+                    </button>
+                </div>
+            </form>
+
+            <!-- Separador -->
+            <div class="auth-divider my-4">
+                <span>o</span>
+            </div>
+
+            <!-- Login -->
+            <div class="text-center">
+                <p class="mb-0">
+                    ¿Ya tienes una cuenta?
+                    <a href="#/login" class="text-decoration-none fw-bold">
+                        Inicia sesión aquí
+                    </a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Información adicional -->
+        <div class="auth-info text-center mt-4">
+            <p class="text-muted small">
+                <i class="bi bi-shield-check"></i>
+                Tus datos están protegidos y nunca serán compartidos
+            </p>
+        </div>
+    </div>
+</div>

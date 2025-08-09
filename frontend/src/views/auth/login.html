@@ -1,0 +1,102 @@
+<div class="auth-page">
+    <div class="auth-container">
+        <div class="auth-card">
+            <!-- Logo y título -->
+            <div class="auth-header text-center mb-4">
+                <div class="auth-logo">
+                    <i class="bi bi-mortarboard-fill"></i>
+                </div>
+                <h2 class="auth-title">TUPAD Organizador</h2>
+                <p class="auth-subtitle">Inicia sesión en tu cuenta</p>
+            </div>
+
+            <!-- Formulario de login -->
+            <form name="loginForm" ng-submit="loginCtrl.login()" novalidate>
+                <!-- Email -->
+                <div class="form-group mb-3">
+                    <label for="email" class="form-label">
+                        <i class="bi bi-envelope"></i> Correo Electrónico
+                    </label>
+                    <input type="email" id="email" name="email" class="form-control" ng-model="loginCtrl.formData.email"
+                        ng-class="{'is-invalid': loginForm.email.$touched && loginForm.email.$invalid}"
+                        placeholder="tu@email.com" required>
+                    <div class="invalid-feedback" ng-show="loginForm.email.$touched && loginForm.email.$invalid">
+                        <span ng-show="loginForm.email.$error.required">El correo electrónico es requerido</span>
+                        <span ng-show="loginForm.email.$error.email">Ingresa un correo electrónico válido</span>
+                    </div>
+                </div>
+
+                <!-- Contraseña -->
+                <div class="form-group mb-3">
+                    <label for="password" class="form-label">
+                        <i class="bi bi-lock"></i> Contraseña
+                    </label>
+                    <div class="input-group">
+                        <input type="password" id="password" name="password" class="form-control"
+                            ng-model="loginCtrl.formData.password"
+                            ng-class="{'is-invalid': loginForm.password.$touched && loginForm.password.$invalid}"
+                            placeholder="Tu contraseña" required>
+                        <button class="btn btn-outline-secondary" type="button"
+                            ng-click="loginCtrl.togglePasswordVisibility()">
+                            <i class="bi" ng-class="loginCtrl.passwordVisible ? 'bi-eye-slash' : 'bi-eye'"></i>
+                        </button>
+                    </div>
+                    <div class="invalid-feedback" ng-show="loginForm.password.$touched && loginForm.password.$invalid">
+                        <span ng-show="loginForm.password.$error.required">La contraseña es requerida</span>
+                    </div>
+                </div>
+
+                <!-- Recordar sesión -->
+                <div class="form-group mb-3">
+                    <div class="form-check">
+                        <input type="checkbox" id="rememberMe" class="form-check-input"
+                            ng-model="loginCtrl.formData.rememberMe">
+                        <label class="form-check-label" for="rememberMe">
+                            Recordar mi sesión
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Botón de login -->
+                <div class="form-group mb-3">
+                    <button type="submit" class="btn btn-primary w-100"
+                        ng-disabled="loginCtrl.loading || loginForm.$invalid">
+                        <span ng-if="loginCtrl.loading" class="spinner-border spinner-border-sm me-2"></span>
+                        <i ng-if="!loginCtrl.loading" class="bi bi-box-arrow-in-right me-2"></i>
+                        {{ loginCtrl.loading ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
+                    </button>
+                </div>
+
+                <!-- Enlaces adicionales -->
+                <div class="auth-links text-center">
+                    <a href="#/forgot-password" class="text-decoration-none">
+                        ¿Olvidaste tu contraseña?
+                    </a>
+                </div>
+            </form>
+
+            <!-- Separador -->
+            <div class="auth-divider my-4">
+                <span>o</span>
+            </div>
+
+            <!-- Registro -->
+            <div class="text-center">
+                <p class="mb-0">
+                    ¿No tienes una cuenta?
+                    <a href="#/register" class="text-decoration-none fw-bold">
+                        Regístrate aquí
+                    </a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Información adicional -->
+        <div class="auth-info text-center mt-4">
+            <p class="text-muted small">
+                <i class="bi bi-shield-check"></i>
+                Tus datos están protegidos con encriptación SSL
+            </p>
+        </div>
+    </div>
+</div>

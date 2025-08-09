@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Login Sin Bloqueador</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .info {
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196f3;
+        }
+
+        .warning {
+            background-color: #fff3e0;
+            border-left: 4px solid #ff9800;
+        }
+
+        .success {
+            background-color: #e8f5e8;
+            border-left: 4px solid #4caf50;
+        }
+
+        .error {
+            background-color: #ffebee;
+            border-left: 4px solid #f44336;
+        }
+
+        button {
+            background-color: #2196f3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:hover {
+            background-color: #1976d2;
+        }
+
+        .log {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+
+        .log.error {
+            color: #dc3545;
+        }
+
+        .log.success {
+            color: #28a745;
+        }
+
+        .log.warning {
+            color: #ffc107;
+        }
+
+        .log.info {
+            color: #17a2b8;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🧪 Test Login Sin Bloqueador de Anuncios</h1>
+
+    <div class="test-section warning">
+        <h3>⚠️ Instrucciones Importantes</h3>
+        <p><strong>Para que este test funcione correctamente:</strong></p>
+        <ol>
+            <li><strong>Deshabilita temporalmente tu bloqueador de anuncios</strong> para este sitio</li>
+            <li>O agrega <code>localhost:3000</code> a la lista blanca de tu bloqueador</li>
+            <li>Asegúrate de que el backend esté corriendo en <code>http://localhost:3000</code></li>
+        </ol>
+    </div>
+
+    <div class="test-section info">
+        <h3>Configuración</h3>
+        <p><strong>Backend URL:</strong> <span id="backendUrl">http://localhost:3000</span></p>
+        <p><strong>Credenciales de prueba:</strong> admin@tupad.edu.ar / AdminTupad2024!</p>
+    </div>
+
+    <div class="test-section">
+        <h3>Tests Disponibles</h3>
+        <button onclick="testHealth()">🏥 Test Health</button>
+        <button onclick="testLogin()">🔐 Test Login</button>
+        <button onclick="testAuthProfile()">👤 Test Auth Profile</button>
+        <button onclick="runAllTests()">🚀 Ejecutar Todos los Tests</button>
+        <button onclick="clearLogs()">🗑️ Limpiar Logs</button>
+    </div>
+
+    <div id="results"></div>
+
+    <script>
+        const BACKEND_URL = 'http://localhost:3000';
+        let authToken = null;
+
+        function log(message, type = 'info') {
+            const results = document.getElementById('results');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `log ${type}`;
+            logEntry.textContent = `${timestamp}: ${message}`;
+            results.appendChild(logEntry);
+            results.scrollTop = results.scrollHeight;
+        }
+
+        function clearLogs() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        async function testHealth() {
+            try {
+                log('🔍 Probando endpoint de salud...');
+                const response = await fetch(`${BACKEND_URL}/api/health`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    log(`✅ Health OK: ${JSON.stringify(data)}`, 'success');
+                } else {
+                    log(`❌ Health Error: ${response.status} - ${JSON.stringify(data)}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Error en health check: ${error.message}`, 'error');
+            }
+        }
+
+        async function testLogin() {
+            try {
+                log('🔐 Probando login...');
+                const loginData = {
+                    email: 'admin@tupad.edu.ar',
+                    password: 'AdminTupad2024!'
+                };
+
+                const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(loginData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    authToken = data.token;
+                    log(`✅ Login exitoso! Token: ${authToken.substring(0, 20)}...`, 'success');
+                } else {
+                    log(`❌ Login falló: ${response.status} - ${JSON.stringify(data)}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Error en login: ${error.message}`, 'error');
+            }
+        }
+
+        async function testAuthProfile() {
+            if (!authToken) {
+                log('⚠️ No hay token de autenticación. Ejecuta el test de login primero.', 'warning');
+                return;
+            }
+
+            try {
+                log('👤 Probando perfil de usuario...');
+                const response = await fetch(`${BACKEND_URL}/api/auth/profile`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    log(`✅ Perfil obtenido: ${JSON.stringify(data)}`, 'success');
+                } else {
+                    log(`❌ Error al obtener perfil: ${response.status} - ${JSON.stringify(data)}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Error en perfil: ${error.message}`, 'error');
+            }
+        }
+
+        async function runAllTests() {
+            clearLogs();
+            log('🚀 Iniciando suite de tests...', 'info');
+
+            await testHealth();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            await testLogin();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            await testAuthProfile();
+
+            log('✅ Suite de tests completada', 'success');
+        }
+
+        // Auto-ejecutar al cargar
+        window.onload = function () {
+            log('🧪 Página cargada, iniciando tests...', 'info');
+            runAllTests();
+        };
+    </script>
+</body>
+
+</html>

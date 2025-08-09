@@ -1,0 +1,410 @@
+<div class="evaluaciones-page">
+    <!-- Header -->
+    <div class="page-header mb-4">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h1 class="page-title">
+                    <i class="bi bi-clipboard-check"></i>
+                    Gestión de Evaluaciones
+                </h1>
+                <p class="page-subtitle">Administra las evaluaciones académicas</p>
+            </div>
+            <div class="col-md-6 text-end">
+                <button class="btn btn-primary me-2" ng-click="evaluacionesCtrl.openModal()">
+                    <i class="bi bi-plus-circle"></i>
+                    Nueva Evaluación
+                </button>
+                <button class="btn btn-outline-secondary me-2" ng-click="evaluacionesCtrl.exportEvaluaciones()">
+                    <i class="bi bi-download"></i>
+                    Exportar
+                </button>
+                <button class="btn btn-outline-info" ng-click="evaluacionesCtrl.importEvaluaciones()">
+                    <i class="bi bi-upload"></i>
+                    Importar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">
+                <i class="bi bi-funnel"></i>
+                Filtros de Búsqueda
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-2 mb-3">
+                    <label class="form-label">Título</label>
+                    <input type="text" class="form-control" ng-model="evaluacionesCtrl.filters.titulo"
+                        placeholder="Buscar por título" ng-change="evaluacionesCtrl.applyFilters()">
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label class="form-label">Materia</label>
+                    <input type="text" class="form-control" ng-model="evaluacionesCtrl.filters.materia"
+                        placeholder="Buscar por materia" ng-change="evaluacionesCtrl.applyFilters()">
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label class="form-label">Tipo</label>
+                    <select class="form-select" ng-model="evaluacionesCtrl.filters.tipo"
+                        ng-change="evaluacionesCtrl.applyFilters()">
+                        <option value="">Todos los tipos</option>
+                        <option ng-repeat="tipo in evaluacionesCtrl.tiposEvaluacion" value="{{ tipo.value }}">
+                            {{ tipo.label }}
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label class="form-label">Estado</label>
+                    <select class="form-select" ng-model="evaluacionesCtrl.filters.estado"
+                        ng-change="evaluacionesCtrl.applyFilters()">
+                        <option value="">Todos los estados</option>
+                        <option ng-repeat="estado in evaluacionesCtrl.estados" value="{{ estado.value }}">
+                            {{ estado.label }}
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label class="form-label">Fecha Inicio</label>
+                    <input type="date" class="form-control" ng-model="evaluacionesCtrl.filters.fecha_inicio"
+                        ng-change="evaluacionesCtrl.applyFilters()">
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label class="form-label">&nbsp;</label>
+                    <button class="btn btn-outline-secondary w-100" ng-click="evaluacionesCtrl.clearFilters()">
+                        <i class="bi bi-x-circle"></i>
+                        Limpiar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div ng-if="evaluacionesCtrl.loading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+        </div>
+        <p class="mt-3 text-muted">Cargando evaluaciones...</p>
+    </div>
+
+    <!-- Tabla de Evaluaciones -->
+    <div class="card" ng-if="!evaluacionesCtrl.loading">
+        <div class="card-header">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-table"></i>
+                        Evaluaciones ({{ evaluacionesCtrl.totalItems }})
+                    </h5>
+                </div>
+                <div class="col-md-6 text-end">
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-outline-secondary"
+                            ng-click="evaluacionesCtrl.changePage(evaluacionesCtrl.currentPage - 1)"
+                            ng-disabled="evaluacionesCtrl.currentPage === 1">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <button class="btn btn-outline-primary" disabled>
+                            Página {{ evaluacionesCtrl.currentPage }} de {{ evaluacionesCtrl.getTotalPages() }}
+                        </button>
+                        <button class="btn btn-outline-secondary"
+                            ng-click="evaluacionesCtrl.changePage(evaluacionesCtrl.currentPage + 1)"
+                            ng-disabled="evaluacionesCtrl.currentPage >= evaluacionesCtrl.getTotalPages()">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Evaluación</th>
+                            <th>Materia</th>
+                            <th>Tipo</th>
+                            <th>Fechas</th>
+                            <th>Puntaje</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-if="evaluacionesCtrl.evaluaciones.length === 0">
+                            <td colspan="7" class="text-center py-4">
+                                <div class="empty-state">
+                                    <i class="bi bi-clipboard-x"></i>
+                                    <h4>No hay evaluaciones</h4>
+                                    <p>No se encontraron evaluaciones con los filtros aplicados</p>
+                                    <button class="btn btn-primary" ng-click="evaluacionesCtrl.openModal()">
+                                        <i class="bi bi-plus-circle"></i>
+                                        Crear primera evaluación
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr ng-repeat="evaluacion in evaluacionesCtrl.evaluaciones" class="evaluacion-row"
+                            ng-class="{'table-warning': evaluacionesCtrl.isProxima(evaluacion), 'table-danger': evaluacionesCtrl.isVencida(evaluacion)}">
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="evaluacion-icon me-2">
+                                        <i class="bi" ng-class="evaluacionesCtrl.getTipoIcon(evaluacion.tipo)"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold">{{ evaluacion.titulo }}</div>
+                                        <div class="text-truncate-2" ng-if="evaluacion.descripcion">
+                                            {{ evaluacion.descripcion }}
+                                        </div>
+                                        <div ng-if="evaluacion.duracion > 0" class="mt-1">
+                                            <small class="text-muted">
+                                                <i class="bi bi-clock"></i>
+                                                Duración: {{ evaluacion.duracion }} min
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark">
+                                    {{ evaluacionesCtrl.getMateriaNombre(evaluacion.materia_id) }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge" ng-class="'bg-' + evaluacionesCtrl.getTipoColor(evaluacion.tipo)">
+                                    <i class="bi me-1" ng-class="evaluacionesCtrl.getTipoIcon(evaluacion.tipo)"></i>
+                                    {{ evaluacion.tipo }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="date-info">
+                                    <div ng-if="evaluacion.fecha_evaluacion">
+                                        <small class="text-muted">Evaluación:</small><br>
+                                        {{ evaluacionesCtrl.formatDate(evaluacion.fecha_evaluacion) }}
+                                    </div>
+                                    <div ng-if="evaluacion.fecha_limite" class="mt-1">
+                                        <small class="text-muted">Límite:</small><br>
+                                        {{ evaluacionesCtrl.formatDate(evaluacion.fecha_limite) }}
+                                    </div>
+                                    <div class="mt-1">
+                                        <small class="text-info">
+                                            <i class="bi bi-alarm"></i>
+                                            {{ evaluacionesCtrl.getTiempoRestante(evaluacion) }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="score-info">
+                                    <div class="fw-bold">{{ evaluacion.puntaje_total }} pts</div>
+                                    <div ng-if="evaluacion.peso > 0">
+                                        <small class="text-muted">Peso: {{ evaluacion.peso }}%</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge"
+                                    ng-class="'bg-' + evaluacionesCtrl.getEstadoColor(evaluacion.estado)">
+                                    {{ evaluacion.estado }}
+                                </span>
+                                <div ng-if="evaluacionesCtrl.isProxima(evaluacion)" class="mt-1">
+                                    <small class="text-warning">
+                                        <i class="bi bi-exclamation-triangle"></i> Próxima
+                                    </small>
+                                </div>
+                                <div ng-if="evaluacionesCtrl.isVencida(evaluacion)" class="mt-1">
+                                    <small class="text-danger">
+                                        <i class="bi bi-x-circle"></i> Vencida
+                                    </small>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <button class="btn btn-outline-info"
+                                        ng-click="evaluacionesCtrl.viewDetails(evaluacion)" title="Ver detalles">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    <button class="btn btn-outline-primary"
+                                        ng-click="evaluacionesCtrl.openModal(evaluacion)" title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-outline-danger"
+                                        ng-click="evaluacionesCtrl.deleteEvaluacion(evaluacion)" title="Eliminar">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Paginación -->
+        <div class="card-footer" ng-if="evaluacionesCtrl.getTotalPages() > 1">
+            <nav aria-label="Navegación de páginas">
+                <ul class="pagination justify-content-center mb-0">
+                    <li class="page-item" ng-class="{ disabled: evaluacionesCtrl.currentPage === 1 }">
+                        <a class="page-link" href="#" ng-click="evaluacionesCtrl.changePage(1)">
+                            <i class="bi bi-chevron-double-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item" ng-class="{ disabled: evaluacionesCtrl.currentPage === 1 }">
+                        <a class="page-link" href="#"
+                            ng-click="evaluacionesCtrl.changePage(evaluacionesCtrl.currentPage - 1)">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+
+                    <li class="page-item" ng-repeat="page in evaluacionesCtrl.getPageRange()"
+                        ng-class="{ active: page === evaluacionesCtrl.currentPage }">
+                        <a class="page-link" href="#" ng-click="evaluacionesCtrl.changePage(page)">
+                            {{ page }}
+                        </a>
+                    </li>
+
+                    <li class="page-item"
+                        ng-class="{ disabled: evaluacionesCtrl.currentPage >= evaluacionesCtrl.getTotalPages() }">
+                        <a class="page-link" href="#"
+                            ng-click="evaluacionesCtrl.changePage(evaluacionesCtrl.currentPage + 1)">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item"
+                        ng-class="{ disabled: evaluacionesCtrl.currentPage >= evaluacionesCtrl.getTotalPages() }">
+                        <a class="page-link" href="#"
+                            ng-click="evaluacionesCtrl.changePage(evaluacionesCtrl.getTotalPages())">
+                            <i class="bi bi-chevron-double-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Modal para Crear/Editar Evaluación -->
+    <div class="modal fade" id="evaluacionModal" tabindex="-1" ng-show="evaluacionesCtrl.showModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi" ng-class="evaluacionesCtrl.editMode ? 'bi-pencil' : 'bi-plus-circle'"></i>
+                        {{ evaluacionesCtrl.editMode ? 'Editar' : 'Nueva' }} Evaluación
+                    </h5>
+                    <button type="button" class="btn-close" ng-click="evaluacionesCtrl.closeModal()"></button>
+                </div>
+                <form ng-submit="evaluacionesCtrl.saveEvaluacion()">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label class="form-label">Título de la evaluación *</label>
+                                <input type="text" class="form-control"
+                                    ng-model="evaluacionesCtrl.evaluacionForm.titulo"
+                                    placeholder="Ej: Examen Final de Programación Web" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Tipo *</label>
+                                <select class="form-select" ng-model="evaluacionesCtrl.evaluacionForm.tipo" required>
+                                    <option ng-repeat="tipo in evaluacionesCtrl.tiposEvaluacion"
+                                        value="{{ tipo.value }}">
+                                        {{ tipo.label }}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Materia *</label>
+                                <select class="form-select" ng-model="evaluacionesCtrl.evaluacionForm.materia_id"
+                                    required>
+                                    <option value="">Seleccionar materia</option>
+                                    <option ng-repeat="materia in evaluacionesCtrl.materias" value="{{ materia.id }}">
+                                        {{ materia.nombre }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Estado</label>
+                                <select class="form-select" ng-model="evaluacionesCtrl.evaluacionForm.estado">
+                                    <option ng-repeat="estado in evaluacionesCtrl.estados" value="{{ estado.value }}">
+                                        {{ estado.label }}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Fecha de evaluación *</label>
+                                <input type="datetime-local" class="form-control"
+                                    ng-model="evaluacionesCtrl.evaluacionForm.fecha_evaluacion" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Fecha límite *</label>
+                                <input type="datetime-local" class="form-control"
+                                    ng-model="evaluacionesCtrl.evaluacionForm.fecha_limite" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Duración (minutos)</label>
+                                <input type="number" class="form-control"
+                                    ng-model="evaluacionesCtrl.evaluacionForm.duracion" min="0" max="480"
+                                    placeholder="0 = sin límite">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Puntaje total *</label>
+                                <input type="number" class="form-control"
+                                    ng-model="evaluacionesCtrl.evaluacionForm.puntaje_total" min="1" max="1000"
+                                    required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Peso (%)</label>
+                                <input type="number" class="form-control"
+                                    ng-model="evaluacionesCtrl.evaluacionForm.peso" min="0" max="100"
+                                    placeholder="0-100">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Ubicación</label>
+                                <input type="text" class="form-control"
+                                    ng-model="evaluacionesCtrl.evaluacionForm.ubicacion"
+                                    placeholder="Ej: Aula 101, Laboratorio 2">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Observaciones</label>
+                                <textarea class="form-control" ng-model="evaluacionesCtrl.evaluacionForm.observaciones"
+                                    rows="2" placeholder="Observaciones adicionales"></textarea>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Descripción</label>
+                            <textarea class="form-control" ng-model="evaluacionesCtrl.evaluacionForm.descripcion"
+                                rows="3" placeholder="Descripción de la evaluación"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Instrucciones</label>
+                            <textarea class="form-control" ng-model="evaluacionesCtrl.evaluacionForm.instrucciones"
+                                rows="4" placeholder="Instrucciones para los estudiantes"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" ng-click="evaluacionesCtrl.closeModal()">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary" ng-disabled="evaluacionesCtrl.loading">
+                            <span ng-if="evaluacionesCtrl.loading" class="spinner-border spinner-border-sm me-2"></span>
+                            <i ng-if="!evaluacionesCtrl.loading" class="bi"
+                                ng-class="evaluacionesCtrl.editMode ? 'bi-check' : 'bi-plus'"></i>
+                            {{ evaluacionesCtrl.loading ? 'Guardando...' : (evaluacionesCtrl.editMode ? 'Actualizar' :
+                            'Crear') }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

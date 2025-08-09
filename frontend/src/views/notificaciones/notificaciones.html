@@ -1,0 +1,292 @@
+<!-- Vista de Notificaciones -->
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="bi bi-bell me-2"></i>Notificaciones
+                    </h1>
+                    <p class="text-muted mb-0">Gestiona tus notificaciones en tiempo real</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary" ng-click="notifCtrl.markAllAsRead()"
+                        ng-disabled="notifCtrl.unreadCount === 0">
+                        <i class="bi bi-check-all me-1"></i>
+                        Marcar todas como leídas
+                    </button>
+                    <button class="btn btn-outline-danger" ng-click="notifCtrl.clearAll()"
+                        ng-disabled="notifCtrl.notifications.length === 0">
+                        <i class="bi bi-trash me-1"></i>
+                        Limpiar todas
+                    </button>
+                    <button class="btn btn-primary" ng-click="notifCtrl.sendTestNotification()">
+                        <i class="bi bi-send me-1"></i>
+                        Enviar prueba
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estado de conexión -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h6 class="mb-2">Estado de conexión</h6>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="status-indicator" ng-class="{
+                                         'status-connected': notifCtrl.isConnected,
+                                         'status-connecting': notifCtrl.connectionStatus === 'connecting',
+                                         'status-disconnected': !notifCtrl.isConnected && notifCtrl.connectionStatus !== 'connecting'
+                                     }">
+                                </div>
+                                <span class="fw-medium">
+                                    {{ notifCtrl.getConnectionStatusText() }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="row text-center">
+                                <div class="col-4">
+                                    <div class="stat-item">
+                                        <div class="stat-number">{{ notifCtrl.notifications.length }}</div>
+                                        <div class="stat-label">Total</div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="stat-item">
+                                        <div class="stat-number text-warning">{{ notifCtrl.unreadCount }}</div>
+                                        <div class="stat-label">No leídas</div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="stat-item">
+                                        <div class="stat-number text-success">{{ notifCtrl.notifications.length -
+                                            notifCtrl.unreadCount }}</div>
+                                        <div class="stat-label">Leídas</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-2">
+                            <label class="form-label">Módulo</label>
+                            <select class="form-select" ng-model="notifCtrl.filters.module">
+                                <option value="">Todos los módulos</option>
+                                <option value="materias">Materias</option>
+                                <option value="evaluaciones">Evaluaciones</option>
+                                <option value="contenidos">Contenidos</option>
+                                <option value="profesores">Profesores</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Tipo</label>
+                            <select class="form-select" ng-model="notifCtrl.filters.type">
+                                <option value="">Todos los tipos</option>
+                                <option value="info">Información</option>
+                                <option value="success">Éxito</option>
+                                <option value="warning">Advertencia</option>
+                                <option value="error">Error</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Estado</label>
+                            <select class="form-select" ng-model="notifCtrl.filters.read">
+                                <option value="">Todos</option>
+                                <option value="false">No leídas</option>
+                                <option value="true">Leídas</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Ordenar por</label>
+                            <select class="form-select" ng-model="notifCtrl.filters.sort">
+                                <option value="timestamp">Fecha (más reciente)</option>
+                                <option value="timestamp_asc">Fecha (más antigua)</option>
+                                <option value="type">Tipo</option>
+                                <option value="title">Título</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Buscar</label>
+                            <input type="text" class="form-control" ng-model="notifCtrl.filters.search"
+                                placeholder="Buscar en notificaciones...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de notificaciones -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-list-ul me-2"></i>
+                        Notificaciones
+                        <span class="badge bg-primary ms-2">{{ notifCtrl.getFilteredNotifications().length }}</span>
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <!-- Loading -->
+                    <div class="text-center p-4" ng-if="notifCtrl.loading">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                    </div>
+
+                    <!-- Sin notificaciones -->
+                    <div class="text-center p-4"
+                        ng-if="!notifCtrl.loading && notifCtrl.getFilteredNotifications().length === 0">
+                        <i class="bi bi-bell-slash text-muted" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3 text-muted">No hay notificaciones</h5>
+                        <p class="text-muted">No se encontraron notificaciones con los filtros aplicados.</p>
+                    </div>
+
+                    <!-- Lista de notificaciones -->
+                    <div class="notification-list"
+                        ng-if="!notifCtrl.loading && notifCtrl.getFilteredNotifications().length > 0">
+                        <div class="notification-item"
+                            ng-repeat="notification in notifCtrl.getFilteredNotifications() track by notification.id"
+                            ng-class="{
+                                 'notification-unread': !notification.read,
+                                 'notification-system': notification.isSystemEvent
+                             }">
+
+                            <!-- Icono de tipo -->
+                            <div class="notification-icon">
+                                <i class="bi"
+                                    ng-class="notifCtrl.getNotificationIcon(notification.type) + ' ' + notifCtrl.getNotificationClass(notification.type)"></i>
+                            </div>
+
+                            <!-- Contenido -->
+                            <div class="notification-content">
+                                <div class="notification-header">
+                                    <h6 class="notification-title mb-1">
+                                        {{ notification.title }}
+                                        <span class="badge"
+                                            ng-class="notifCtrl.getNotificationBadgeClass(notification.type)"
+                                            ng-if="notification.isSystemEvent">
+                                            Sistema
+                                        </span>
+                                    </h6>
+                                    <small class="text-muted">
+                                        {{ notification.timestamp | formatDate:'relative' }}
+                                    </small>
+                                </div>
+                                <p class="notification-message mb-2">{{ notification.message }}</p>
+
+                                <!-- Datos adicionales -->
+                                <div class="notification-data"
+                                    ng-if="notification.data && Object.keys(notification.data).length > 0">
+                                    <small class="text-muted">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        Datos adicionales disponibles
+                                    </small>
+                                </div>
+                            </div>
+
+                            <!-- Acciones -->
+                            <div class="notification-actions">
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-primary"
+                                        ng-click="notifCtrl.markAsRead(notification.id)" ng-if="!notification.read"
+                                        title="Marcar como leída">
+                                        <i class="bi bi-check"></i>
+                                    </button>
+                                    <button class="btn btn-outline-info" ng-click="notifCtrl.viewDetails(notification)"
+                                        title="Ver detalles">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    <button class="btn btn-outline-danger"
+                                        ng-click="notifCtrl.removeNotification(notification.id)" title="Eliminar">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de detalles -->
+<div class="modal fade" id="notificationDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-info-circle me-2"></i>
+                    Detalles de la notificación
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" ng-if="notifCtrl.selectedNotification">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h6>{{ notifCtrl.selectedNotification.title }}</h6>
+                        <p class="text-muted">{{ notifCtrl.selectedNotification.message }}</p>
+
+                        <div class="mb-3">
+                            <strong>Tipo:</strong>
+                            <span class="badge"
+                                ng-class="notifCtrl.getNotificationBadgeClass(notifCtrl.selectedNotification.type)">
+                                {{ notifCtrl.getNotificationTypeText(notifCtrl.selectedNotification.type) }}
+                            </span>
+                        </div>
+
+                        <div class="mb-3">
+                            <strong>Fecha:</strong>
+                            {{ notifCtrl.selectedNotification.timestamp | formatDate:'full' }}
+                        </div>
+
+                        <div class="mb-3" ng-if="notifCtrl.selectedNotification.isSystemEvent">
+                            <strong>Severidad:</strong>
+                            <span class="badge bg-warning">{{ notifCtrl.selectedNotification.severity }}</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">Datos adicionales</h6>
+                            </div>
+                            <div class="card-body">
+                                <pre class="mb-0"
+                                    ng-if="notifCtrl.selectedNotification.data">{{ notifCtrl.selectedNotification.data | json }}</pre>
+                                <p class="text-muted mb-0" ng-if="!notifCtrl.selectedNotification.data">No hay datos
+                                    adicionales</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary"
+                    ng-click="notifCtrl.markAsRead(notifCtrl.selectedNotification.id)"
+                    ng-if="notifCtrl.selectedNotification && !notifCtrl.selectedNotification.read">
+                    Marcar como leída
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

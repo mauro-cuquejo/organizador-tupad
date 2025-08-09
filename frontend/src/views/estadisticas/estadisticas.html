@@ -1,0 +1,362 @@
+<!-- Vista de Estadísticas -->
+<div class="container-fluid" ng-controller="EstadisticasController as statsCtrl">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="bi bi-graph-up me-2"></i>Estadísticas
+                    </h1>
+                    <p class="text-muted mb-0">Análisis y reportes de la aplicación</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary" ng-click="statsCtrl.exportStats()"
+                        ng-disabled="statsCtrl.loading">
+                        <loading-spinner ng-if="statsCtrl.loading"></loading-spinner>
+                        <i class="bi bi-download me-2" ng-if="!statsCtrl.loading"></i>
+                        {{ statsCtrl.loading ? 'Exportando...' : 'Exportar' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Período</label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="periodo" id="semana"
+                                    ng-model="statsCtrl.filters.periodo" value="semana"
+                                    ng-change="statsCtrl.changePeriodo('semana')">
+                                <label class="btn btn-outline-primary" for="semana">Semana</label>
+
+                                <input type="radio" class="btn-check" name="periodo" id="mes"
+                                    ng-model="statsCtrl.filters.periodo" value="mes"
+                                    ng-change="statsCtrl.changePeriodo('mes')">
+                                <label class="btn btn-outline-primary" for="mes">Mes</label>
+
+                                <input type="radio" class="btn-check" name="periodo" id="trimestre"
+                                    ng-model="statsCtrl.filters.periodo" value="trimestre"
+                                    ng-change="statsCtrl.changePeriodo('trimestre')">
+                                <label class="btn btn-outline-primary" for="trimestre">Trimestre</label>
+
+                                <input type="radio" class="btn-check" name="periodo" id="anio"
+                                    ng-model="statsCtrl.filters.periodo" value="anio"
+                                    ng-change="statsCtrl.changePeriodo('anio')">
+                                <label class="btn btn-outline-primary" for="anio">Año</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="fechaInicio" class="form-label">Fecha Inicio</label>
+                            <input type="date" class="form-control" id="fechaInicio"
+                                ng-model="statsCtrl.filters.fechaInicio">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="fechaFin" class="form-label">Fecha Fin</label>
+                            <input type="date" class="form-control" id="fechaFin" ng-model="statsCtrl.filters.fechaFin">
+                        </div>
+                        <div class="col-md-3">
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-primary" ng-click="statsCtrl.applyDateFilters()"
+                                    ng-disabled="!statsCtrl.filters.fechaInicio || !statsCtrl.filters.fechaFin">
+                                    <i class="bi bi-search me-2"></i>Aplicar
+                                </button>
+                                <button class="btn btn-outline-secondary" ng-click="statsCtrl.clearDateFilters()">
+                                    <i class="bi bi-x-circle me-2"></i>Limpiar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas generales -->
+    <div class="row mb-4">
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-book text-primary fs-1"></i>
+                    <h4 class="mt-2">{{ statsCtrl.stats.general?.totalMaterias || 0 }}</h4>
+                    <p class="text-muted mb-0">Total Materias</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-clipboard-check text-success fs-1"></i>
+                    <h4 class="mt-2">{{ statsCtrl.stats.general?.totalEvaluaciones || 0 }}</h4>
+                    <p class="text-muted mb-0">Total Evaluaciones</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-file-text text-info fs-1"></i>
+                    <h4 class="mt-2">{{ statsCtrl.stats.general?.totalContenidos || 0 }}</h4>
+                    <p class="text-muted mb-0">Total Contenidos</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-person-badge text-warning fs-1"></i>
+                    <h4 class="mt-2">{{ statsCtrl.stats.general?.totalProfesores || 0 }}</h4>
+                    <p class="text-muted mb-0">Total Profesores</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progreso de completitud -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-pie-chart me-2"></i>Progreso General
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Completitud de Materias</span>
+                                <span class="fw-bold">{{ statsCtrl.getCompletionPercentage() }}%</span>
+                            </div>
+                            <div class="progress" style="height: 20px;">
+                                <div class="progress-bar bg-{{ statsCtrl.getCompletionColor() }}" role="progressbar"
+                                    style="width: {{ statsCtrl.getCompletionPercentage() }}%"
+                                    aria-valuenow="{{ statsCtrl.getCompletionPercentage() }}" aria-valuemin="0"
+                                    aria-valuemax="100">
+                                    {{ statsCtrl.getCompletionPercentage() }}%
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="display-4 text-{{ statsCtrl.getCompletionColor() }}">
+                                {{ statsCtrl.getCompletionPercentage() }}%
+                            </div>
+                            <p class="text-muted mb-0">Completado</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos -->
+    <div class="row mb-4">
+        <!-- Materias por Estado -->
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-pie-chart me-2"></i>Materias por Estado
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <tupad-doughnut-chart labels="statsCtrl.materiasLabels" datasets="statsCtrl.materiasDatasets"
+                        options="statsCtrl.materiasOptions">
+                    </tupad-doughnut-chart>
+                </div>
+            </div>
+        </div>
+
+        <!-- Evaluaciones por Mes -->
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-graph-up me-2"></i>Evaluaciones por Mes
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <tupad-line-chart labels="statsCtrl.evaluacionesLabels" datasets="statsCtrl.evaluacionesDatasets"
+                        options="statsCtrl.evaluacionesOptions">
+                    </tupad-line-chart>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <!-- Contenidos por Tipo -->
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-bar-chart me-2"></i>Contenidos por Tipo
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <tupad-bar-chart labels="statsCtrl.contenidosLabels" datasets="statsCtrl.contenidosDatasets"
+                        options="statsCtrl.contenidosOptions">
+                    </tupad-bar-chart>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profesores por Departamento -->
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-pie-chart me-2"></i>Profesores por Departamento
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <tupad-chart type="'pie'" data="statsCtrl.profesoresData" options="statsCtrl.profesoresOptions">
+                    </tupad-chart>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas de rendimiento -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-speedometer2 me-2"></i>Rendimiento
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 text-center mb-3">
+                            <div class="display-6 text-primary">{{ statsCtrl.getPerformanceStats().promedioEvaluaciones
+                                || 0 }}</div>
+                            <p class="text-muted mb-0">Promedio Evaluaciones</p>
+                        </div>
+                        <div class="col-md-3 text-center mb-3">
+                            <div class="display-6 text-warning">{{
+                                statsCtrl.getPerformanceStats().evaluacionesPendientes || 0 }}</div>
+                            <p class="text-muted mb-0">Evaluaciones Pendientes</p>
+                        </div>
+                        <div class="col-md-3 text-center mb-3">
+                            <div class="display-6 text-success">{{
+                                statsCtrl.getPerformanceStats().evaluacionesCompletadas || 0 }}</div>
+                            <p class="text-muted mb-0">Evaluaciones Completadas</p>
+                        </div>
+                        <div class="col-md-3 text-center mb-3">
+                            <div class="display-6 text-info">{{ statsCtrl.getPerformanceStats().tasaCompletitud || 0 }}%
+                            </div>
+                            <p class="text-muted mb-0">Tasa de Completitud</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tendencias y Alertas -->
+    <div class="row">
+        <!-- Tendencias -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-trending-up me-2"></i>Tendencias
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush" ng-if="statsCtrl.getTrends().length > 0">
+                        <div class="list-group-item d-flex justify-content-between align-items-center"
+                            ng-repeat="trend in statsCtrl.getTrends()">
+                            <div>
+                                <i class="bi me-2" ng-class="trend.icon"></i>
+                                {{ trend.descripcion }}
+                            </div>
+                            <span class="badge bg-{{ trend.color }} rounded-pill">
+                                {{ trend.valor }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="text-center text-muted" ng-if="statsCtrl.getTrends().length === 0">
+                        <i class="bi bi-info-circle fs-1"></i>
+                        <p class="mt-2">No hay tendencias disponibles</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alertas -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-exclamation-triangle me-2"></i>Alertas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush" ng-if="statsCtrl.getAlerts().length > 0">
+                        <div class="list-group-item d-flex justify-content-between align-items-center"
+                            ng-repeat="alert in statsCtrl.getAlerts()">
+                            <div>
+                                <i class="bi me-2" ng-class="alert.icon"></i>
+                                {{ alert.mensaje }}
+                            </div>
+                            <span class="badge bg-{{ alert.color }} rounded-pill">
+                                {{ alert.prioridad }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="text-center text-muted" ng-if="statsCtrl.getAlerts().length === 0">
+                        <i class="bi bi-check-circle fs-1"></i>
+                        <p class="mt-2">No hay alertas activas</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<style>
+    .chart-container {
+        position: relative;
+        margin: auto;
+    }
+
+    .card.text-center:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+        transition: all 0.3s ease;
+    }
+
+    .theme-dark .card.text-center:hover {
+        box-shadow: var(--shadow);
+    }
+
+    .progress {
+        background-color: var(--bg-tertiary);
+    }
+
+    .theme-dark .progress {
+        background-color: var(--bg-tertiary);
+    }
+
+    .list-group-item {
+        border-color: var(--border-color);
+        background-color: var(--bg-card);
+        color: var(--text-primary);
+    }
+
+    .theme-dark .list-group-item {
+        border-color: var(--border-color);
+        background-color: var(--bg-card);
+        color: var(--text-primary);
+    }
+</style>

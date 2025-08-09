@@ -1,0 +1,59 @@
+{
+    "name": "tupad-organizador-frontend",
+    "version": "1.0.0",
+    "description": "Frontend para sistema de organización académica TUPAD",
+    "main": "index.js",
+    "scripts": {
+        "start": "http-server -p 8080 -c-1",
+        "dev": "http-server -p 8080 -c-1 --cors",
+        "build": "echo 'Build completed'",
+        "test": "karma start karma.conf.js",
+        "test:watch": "karma start karma.conf.js --watch",
+        "lint": "eslint src/**/*.js",
+        "lint:fix": "eslint src/**/*.js --fix",
+        "audit": "npm audit",
+        "audit:fix": "npm audit fix",
+        "security-check": "npm audit --audit-level=high"
+    },
+    "keywords": [
+        "angularjs",
+        "academic",
+        "organizer",
+        "tupad",
+        "frontend"
+    ],
+    "author": "TUPAD Team",
+    "license": "MIT",
+    "dependencies": {
+        "angular": "^1.8.3",
+        "angular-animate": "^1.8.3",
+        "angular-cookies": "^1.8.3",
+        "angular-local-storage": "^0.7.1",
+        "angular-messages": "^1.8.3",
+        "angular-moment": "^1.3.0",
+        "angular-route": "^1.8.3",
+        "angular-sanitize": "^1.8.3",
+        "angular-toastr": "^2.1.1",
+        "bootstrap": "^5.3.0",
+        "bootstrap-icons": "^1.10.5",
+        "chart.js": "^4.4.0",
+        "moment": "^2.29.4",
+        "ng-file-upload": "^12.2.13"
+    },
+    "devDependencies": {
+        "angular-mocks": "^1.8.3",
+        "eslint": "^8.45.0",
+        "eslint-plugin-angular": "^4.1.0",
+        "http-server": "^14.1.1",
+        "jasmine-core": "^4.6.0",
+        "karma": "^6.4.2",
+        "karma-chrome-launcher": "^3.2.0",
+        "karma-jasmine": "^5.1.0",
+        "helmet": "^7.1.0",
+        "express-rate-limit": "^7.1.5"
+    },
+    "engines": {
+        "node": ">=14.0.0",
+        "npm": ">=6.0.0"
+    }
+}

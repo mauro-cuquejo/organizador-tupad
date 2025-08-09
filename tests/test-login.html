@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+
+        .info {
+            background-color: #d1ecf1;
+            border-color: #bee5eb;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #results {
+            margin-top: 20px;
+        }
+
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid #007bff;
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🧪 Test del Sistema de Login</h1>
+
+    <div class="test-section info">
+        <h3>Configuración</h3>
+        <p><strong>Backend URL:</strong> <span id="backendUrl">http://localhost:3000</span></p>
+        <p><strong>Credenciales de prueba:</strong> admin@tupad.edu.ar / AdminTupad2024!</p>
+    </div>
+
+    <div class="test-section">
+        <h3>Tests Disponibles</h3>
+        <button onclick="testHealth()">🏥 Test Health</button>
+        <button onclick="testLogin()">🔐 Test Login</button>
+        <button onclick="testAuthProfile()">👤 Test Auth Profile</button>
+        <button onclick="runAllTests()">🚀 Ejecutar Todos los Tests</button>
+        <button onclick="clearLogs()">🗑️ Limpiar Logs</button>
+    </div>
+
+    <div id="results"></div>
+
+    <script>
+        const BACKEND_URL = 'http://localhost:3000';
+        let authToken = null;
+
+        function log(message, type = 'info') {
+            const results = document.getElementById('results');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${type}`;
+            logEntry.innerHTML = `<strong>${timestamp}</strong>: ${message}`;
+            results.appendChild(logEntry);
+            results.scrollTop = results.scrollHeight;
+        }
+
+        function clearLogs() {
+            document.getElementById('results').innerHTML = '';
+            authToken = null;
+        }
+
+        async function testHealth() {
+            try {
+                log('🔍 Probando endpoint de salud...', 'info');
+                const response = await fetch(`${BACKEND_URL}/api/health`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ Health OK - Status: ${data.status}, Environment: ${data.environment}`, 'success');
+                } else {
+                    log(`❌ Health Error - Status: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Error en health: ${error.message}`, 'error');
+            }
+        }
+
+        async function testLogin() {
+            try {
+                log('🔐 Probando login...', 'info');
+
+                const loginData = {
+                    email: 'admin@tupad.edu.ar',
+                    password: 'AdminTupad2024!'
+                };
+
+                const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(loginData)
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    authToken = data.token;
+                    log(`✅ Login exitoso - Token recibido: ${authToken.substring(0, 20)}...`, 'success');
+                    log(`👤 Usuario: ${data.user.nombre} ${data.user.apellido}`, 'success');
+                    log(`🎭 Rol: ${data.user.rol}`, 'success');
+                } else {
+                    const errorData = await response.json();
+                    log(`❌ Login falló - Status: ${response.status}, Error: ${errorData.error || errorData.message}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Error en login: ${error.message}`, 'error');
+            }
+        }
+
+        async function testAuthProfile() {
+            if (!authToken) {
+                log('⚠️ No hay token de autenticación. Ejecuta el test de login primero.', 'error');
+                return;
+            }
+
+            try {
+                log('👤 Probando endpoint de perfil...', 'info');
+
+                const response = await fetch(`${BACKEND_URL}/api/auth/profile`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ Perfil obtenido exitosamente`, 'success');
+                    log(`👤 Usuario: ${data.user.nombre} ${data.user.apellido}`, 'success');
+                    log(`📧 Email: ${data.user.email}`, 'success');
+                    log(`🎭 Rol: ${data.user.rol}`, 'success');
+                } else {
+                    const errorData = await response.json();
+                    log(`❌ Error al obtener perfil - Status: ${response.status}, Error: ${errorData.error || errorData.message}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Error en perfil: ${error.message}`, 'error');
+            }
+        }
+
+        async function runAllTests() {
+            log('🚀 Iniciando suite completa de tests...', 'info');
+            clearLogs();
+
+            // Test 1: Health
+            await testHealth();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            // Test 2: Login
+            await testLogin();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            // Test 3: Profile (solo si login fue exitoso)
+            if (authToken) {
+                await testAuthProfile();
+            }
+
+            log('🏁 Suite de tests completada', 'info');
+        }
+
+        // Auto-ejecutar health test al cargar
+        window.onload = function () {
+            log('🚀 Página cargada, iniciando test de salud...', 'info');
+            setTimeout(testHealth, 1000);
+        };
+    </script>
+</body>
+
+</html>

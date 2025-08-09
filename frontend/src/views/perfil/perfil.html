@@ -1,0 +1,425 @@
+<!-- Vista del Perfil de Usuario -->
+<div class="container-fluid" ng-controller="PerfilController as perfilCtrl">
+    <!-- Header del perfil -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <div class="user-avatar-large">
+                                <div class="avatar-circle" ng-if="!perfilCtrl.currentUser?.avatar">
+                                    <span class="avatar-text">{{ perfilCtrl.getUserInitials() }}</span>
+                                </div>
+                                <img ng-if="perfilCtrl.currentUser?.avatar" ng-src="{{ perfilCtrl.currentUser.avatar }}"
+                                    alt="Avatar" class="avatar-image">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <h2 class="mb-1">{{ perfilCtrl.getFullName() }}</h2>
+                            <p class="text-muted mb-2">
+                                <i class="bi bi-envelope me-2"></i>{{ perfilCtrl.currentUser?.email }}
+                            </p>
+                            <p class="text-muted mb-0">
+                                <i class="bi bi-calendar me-2"></i>
+                                Miembro desde hace {{ perfilCtrl.getTimeSinceRegistration() }}
+                            </p>
+                        </div>
+                        <div class="col-auto">
+                            <button class="btn btn-outline-primary" ng-click="perfilCtrl.toggleTheme()"
+                                title="Alternar tema">
+                                <i class="bi" ng-class="perfilCtrl.themeIcon"></i>
+                                {{ perfilCtrl.themeName }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas del usuario -->
+    <div class="row mb-4">
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-book text-primary fs-1"></i>
+                    <h4 class="mt-2">{{ perfilCtrl.getUserStats().materias }}</h4>
+                    <p class="text-muted mb-0">Materias</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-clipboard-check text-success fs-1"></i>
+                    <h4 class="mt-2">{{ perfilCtrl.getUserStats().evaluaciones }}</h4>
+                    <p class="text-muted mb-0">Evaluaciones</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-file-text text-info fs-1"></i>
+                    <h4 class="mt-2">{{ perfilCtrl.getUserStats().contenidos }}</h4>
+                    <p class="text-muted mb-0">Contenidos</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-person-badge text-warning fs-1"></i>
+                    <h4 class="mt-2">{{ perfilCtrl.getUserStats().profesores }}</h4>
+                    <p class="text-muted mb-0">Profesores</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="row">
+        <!-- Columna izquierda -->
+        <div class="col-lg-8">
+            <!-- Información del perfil -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-person me-2"></i>Información del Perfil
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form ng-submit="perfilCtrl.saveProfile()">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="nombre" class="form-label">Nombre *</label>
+                                <input type="text" class="form-control" id="nombre"
+                                    ng-model="perfilCtrl.profileForm.nombre" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="apellido" class="form-label">Apellido *</label>
+                                <input type="text" class="form-control" id="apellido"
+                                    ng-model="perfilCtrl.profileForm.apellido" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email *</label>
+                                <input type="email" class="form-control" id="email"
+                                    ng-model="perfilCtrl.profileForm.email" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="telefono" class="form-label">Teléfono</label>
+                                <input type="tel" class="form-control" id="telefono"
+                                    ng-model="perfilCtrl.profileForm.telefono">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="departamento" class="form-label">Departamento</label>
+                                <input type="text" class="form-control" id="departamento"
+                                    ng-model="perfilCtrl.profileForm.departamento">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="cargo" class="form-label">Cargo</label>
+                                <input type="text" class="form-control" id="cargo"
+                                    ng-model="perfilCtrl.profileForm.cargo">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="bio" class="form-label">Biografía</label>
+                            <textarea class="form-control" id="bio" rows="3" ng-model="perfilCtrl.profileForm.bio"
+                                placeholder="Cuéntanos un poco sobre ti..."></textarea>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary" ng-disabled="perfilCtrl.saving">
+                                <loading-spinner ng-if="perfilCtrl.saving"></loading-spinner>
+                                <i class="bi bi-check-lg me-2" ng-if="!perfilCtrl.saving"></i>
+                                {{ perfilCtrl.saving ? 'Guardando...' : 'Guardar Cambios' }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Cambio de contraseña -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-shield-lock me-2"></i>Cambiar Contraseña
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form ng-submit="perfilCtrl.changePassword()">
+                        <div class="mb-3">
+                            <label for="currentPassword" class="form-label">Contraseña Actual *</label>
+                            <input type="password" class="form-control" id="currentPassword"
+                                ng-model="perfilCtrl.passwordForm.currentPassword" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="newPassword" class="form-label">Nueva Contraseña *</label>
+                                <input type="password" class="form-control" id="newPassword"
+                                    ng-model="perfilCtrl.passwordForm.newPassword" required minlength="8">
+                                <div class="form-text">Mínimo 8 caracteres</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="confirmPassword" class="form-label">Confirmar Contraseña *</label>
+                                <input type="password" class="form-control" id="confirmPassword"
+                                    ng-model="perfilCtrl.passwordForm.confirmPassword" required>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <button type="button" class="btn btn-outline-secondary me-2"
+                                ng-click="perfilCtrl.resetPasswordForm()">
+                                Limpiar
+                            </button>
+                            <button type="submit" class="btn btn-warning" ng-disabled="perfilCtrl.saving">
+                                <loading-spinner ng-if="perfilCtrl.saving"></loading-spinner>
+                                <i class="bi bi-key me-2" ng-if="!perfilCtrl.saving"></i>
+                                {{ perfilCtrl.saving ? 'Cambiando...' : 'Cambiar Contraseña' }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna derecha -->
+        <div class="col-lg-4">
+            <!-- Configuración de temas -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-palette me-2"></i>Apariencia
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Tema de la aplicación</label>
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-outline-primary text-start"
+                                ng-class="{'active': perfilCtrl.currentTheme === theme.value}"
+                                ng-repeat="theme in perfilCtrl.themes" ng-click="perfilCtrl.changeTheme(theme.value)">
+                                <i class="bi me-2" ng-class="theme.icon"></i>
+                                {{ theme.label }}
+                                <i class="bi bi-check-lg float-end" ng-if="perfilCtrl.currentTheme === theme.value"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="alert alert-info" ng-if="perfilCtrl.isAutoTheme()">
+                        <i class="bi bi-info-circle me-2"></i>
+                        El tema se ajusta automáticamente según la configuración de tu sistema.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuración de notificaciones -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-bell me-2"></i>Notificaciones
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="emailNotifications"
+                                ng-model="perfilCtrl.notificationSettings.emailNotifications">
+                            <label class="form-check-label" for="emailNotifications">
+                                Notificaciones por email
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="pushNotifications"
+                                ng-model="perfilCtrl.notificationSettings.pushNotifications">
+                            <label class="form-check-label" for="pushNotifications">
+                                Notificaciones push
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="weeklyReports"
+                                ng-model="perfilCtrl.notificationSettings.weeklyReports">
+                            <label class="form-check-label" for="weeklyReports">
+                                Reportes semanales
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="deadlineReminders"
+                                ng-model="perfilCtrl.notificationSettings.deadlineReminders">
+                            <label class="form-check-label" for="deadlineReminders">
+                                Recordatorios de fechas límite
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="evaluationAlerts"
+                                ng-model="perfilCtrl.notificationSettings.evaluationAlerts">
+                            <label class="form-check-label" for="evaluationAlerts">
+                                Alertas de evaluaciones
+                            </label>
+                        </div>
+                    </div>
+                    <div class="d-grid">
+                        <button type="button" class="btn btn-primary" ng-click="perfilCtrl.saveNotificationSettings()">
+                            <i class="bi bi-check-lg me-2"></i>Guardar Configuración
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuración de interfaz -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-gear me-2"></i>Interfaz
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="compactMode"
+                                ng-model="perfilCtrl.interfaceSettings.compactMode">
+                            <label class="form-check-label" for="compactMode">
+                                Modo compacto
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="showAnimations"
+                                ng-model="perfilCtrl.interfaceSettings.showAnimations">
+                            <label class="form-check-label" for="showAnimations">
+                                Mostrar animaciones
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="autoRefresh"
+                                ng-model="perfilCtrl.interfaceSettings.autoRefresh">
+                            <label class="form-check-label" for="autoRefresh">
+                                Actualización automática
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-3" ng-if="perfilCtrl.interfaceSettings.autoRefresh">
+                        <label for="refreshInterval" class="form-label">Intervalo de actualización (segundos)</label>
+                        <input type="number" class="form-control" id="refreshInterval"
+                            ng-model="perfilCtrl.interfaceSettings.refreshInterval" min="10" max="300">
+                    </div>
+                    <div class="d-grid">
+                        <button type="button" class="btn btn-primary" ng-click="perfilCtrl.saveInterfaceSettings()">
+                            <i class="bi bi-check-lg me-2"></i>Guardar Configuración
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Acciones de cuenta -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-exclamation-triangle me-2"></i>Acciones de Cuenta
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-outline-info" ng-click="perfilCtrl.exportUserData()"
+                            ng-disabled="perfilCtrl.loading">
+                            <loading-spinner ng-if="perfilCtrl.loading"></loading-spinner>
+                            <i class="bi bi-download me-2" ng-if="!perfilCtrl.loading"></i>
+                            {{ perfilCtrl.loading ? 'Exportando...' : 'Exportar Datos' }}
+                        </button>
+                        <button type="button" class="btn btn-outline-danger" ng-click="perfilCtrl.deleteAccount()"
+                            ng-disabled="perfilCtrl.loading">
+                            <loading-spinner ng-if="perfilCtrl.loading"></loading-spinner>
+                            <i class="bi bi-trash me-2" ng-if="!perfilCtrl.loading"></i>
+                            {{ perfilCtrl.loading ? 'Eliminando...' : 'Eliminar Cuenta' }}
+                        </button>
+                    </div>
+                    <div class="alert alert-warning mt-3">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <strong>Advertencia:</strong> La eliminación de cuenta es permanente y no se puede deshacer.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Estilos adicionales para el perfil -->
+<style>
+    .user-avatar-large {
+        width: 80px;
+        height: 80px;
+        position: relative;
+    }
+
+    .avatar-circle {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary-color), var(--info-color));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .avatar-image {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .theme-dark .avatar-circle {
+        background: linear-gradient(135deg, var(--primary-color), var(--info-color));
+    }
+
+    /* Animaciones para los botones de tema */
+    .btn-outline-primary.active {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+    }
+
+    .theme-dark .btn-outline-primary.active {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: var(--text-light);
+    }
+
+    /* Mejoras para los switches */
+    .form-check-input:checked {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .theme-dark .form-check-input:checked {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    /* Mejoras para las tarjetas de estadísticas */
+    .card.text-center:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+        transition: all 0.3s ease;
+    }
+
+    .theme-dark .card.text-center:hover {
+        box-shadow: var(--shadow);
+    }
+</style>
