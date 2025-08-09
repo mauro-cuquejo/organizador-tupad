@@ -1,10 +1,9 @@
 import { NavLink } from 'react-router-dom'
 import {
   HomeIcon,
-  BookOpenIcon,
-  ClockIcon,
+  AcademicCapIcon,
   UserGroupIcon,
-  DocumentTextIcon,
+  CalendarIcon,
   ChartBarIcon,
   BellIcon
 } from '@heroicons/react/24/outline'
@@ -12,8 +11,8 @@ import { cn } from '@/utils/cn'
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Materias', href: '/materias', icon: BookOpenIcon },
-  { name: 'Horarios', href: '/horarios', icon: ClockIcon },
+  { name: 'Materias', href: '/materias', icon: AcademicCapIcon },
+  { name: 'Horarios', href: '/horarios', icon: CalendarIcon },
   { name: 'Profesores', href: '/profesores', icon: UserGroupIcon },
   { name: 'Estadísticas', href: '/estadisticas', icon: ChartBarIcon },
   { name: 'Notificaciones', href: '/notificaciones', icon: BellIcon },

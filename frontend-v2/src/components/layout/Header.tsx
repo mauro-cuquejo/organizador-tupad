@@ -7,7 +7,6 @@ import {
   HomeIcon,
   CalendarIcon,
   BookOpenIcon,
-  DocumentTextIcon,
   ClipboardDocumentCheckIcon,
   BellIcon,
   UserGroupIcon,

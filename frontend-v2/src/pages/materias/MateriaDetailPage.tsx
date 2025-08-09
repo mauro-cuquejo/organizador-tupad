@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { materiasService, type Materia } from '@/services/materiasService'
+import { useAuthStore } from '@/stores/authStore'
 import toast from 'react-hot-toast'
 import {
   BookOpenIcon,
   ArrowLeftIcon,
-  EyeIcon,
   AcademicCapIcon,
   DocumentTextIcon,
   UserIcon,
@@ -95,199 +95,281 @@ interface ContenidoMateria {
 export function MateriaDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const { token, isAuthenticated, login } = useAuthStore()
   const [materia, setMateria] = useState<Materia | null>(null)
   const [contenido, setContenido] = useState<ContenidoMateria | null>(null)
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState('general')
+  const [error, setError] = useState<string | null>(null)
   const [selectedComision, setSelectedComision] = useState<number | null>(null)
+  const [activeTab, setActiveTab] = useState<'general' | 'contenido' | 'evaluacion' | 'recursos'>('general')
+
+  // Estados para el modal de relogin
+  const [showReloginModal, setShowReloginModal] = useState(false)
+  const [reloginLoading, setReloginLoading] = useState(false)
+  const [reloginCredentials, setReloginCredentials] = useState({
+    email: '',
+    password: ''
+  })
 
   useEffect(() => {
-    const loadMateria = async () => {
-      if (!id) return
+    if (id && isAuthenticated && token) {
+      loadMateria()
+    }
+  }, [id, isAuthenticated, token])
 
-      setLoading(true)
-      try {
-        // Cargar datos básicos de la materia
-        const materiaData = await materiasService.getById(parseInt(id))
-        setMateria(materiaData)
+  // Monitorear cambios en materia
+  useEffect(() => {
+    console.log('🔄 Estado de materia cambió:', materia)
+  }, [materia])
 
-        // Simular carga de contenido (en un caso real, esto vendría del backend)
-        const contenidoSimulado: ContenidoMateria = {
-          nombre: materiaData.nombre,
-          codigo: materiaData.codigo,
-          creditos: materiaData.creditos,
-          horas: 48,
-          semestre: "2025-1",
-          descripcion: materiaData.descripcion || "Descripción detallada de la materia",
-          objetivos: [
-            "Desarrollar competencias comunicativas básicas",
-            "Adquirir vocabulario esencial para la comunicación cotidiana",
-            "Comprender estructuras gramaticales fundamentales",
-            "Desarrollar habilidades de lectura y escritura básicas"
-          ],
-          unidades: [
-            {
-              numero: 1,
-              titulo: "Introducción y Fundamentos",
-              duracion: "2 semanas",
-              horas: 8,
-              temas: [
-                {
-                  titulo: "Conceptos básicos",
-                  descripcion: "Introducción a los conceptos fundamentales de la materia",
-                  actividades: [
-                    "Lectura de material introductorio",
-                    "Ejercicios de aplicación",
-                    "Discusiones en grupo"
-                  ],
-                  recursos: [
-                    "Material de lectura",
-                    "Presentaciones",
-                    "Videos explicativos"
-                  ]
-                }
-              ]
-            },
-            {
-              numero: 2,
-              titulo: "Desarrollo de Competencias",
-              duracion: "3 semanas",
-              horas: 12,
-              temas: [
-                {
-                  titulo: "Aplicación práctica",
-                  descripcion: "Desarrollo de habilidades prácticas en la materia",
-                  actividades: [
-                    "Ejercicios prácticos",
-                    "Proyectos individuales",
-                    "Evaluaciones formativas"
-                  ],
-                  recursos: [
-                    "Guías de práctica",
-                    "Herramientas digitales",
-                    "Material de apoyo"
-                  ]
-                }
-              ]
-            }
-          ],
-          evaluacion: {
-            parcial1: {
-              porcentaje: 25,
-              fecha: "Semana 6",
-              contenido: "Unidades 1-2"
-            },
-            parcial2: {
-              porcentaje: 25,
-              fecha: "Semana 10",
-              contenido: "Unidades 2-3"
-            },
-            final: {
-              porcentaje: 30,
-              fecha: "Semana 14",
-              contenido: "Todo el curso"
-            },
-            participacion: {
-              porcentaje: 20,
-              descripcion: "Participación en clase y tareas"
-            }
-          },
-          recursos: {
-            bibliografia: [
-              "Libro de texto principal de la materia",
-              "Material complementario recomendado",
-              "Artículos académicos relevantes"
-            ],
-            plataformas: [
-              "Plataforma de aprendizaje virtual",
-              "Recursos digitales complementarios"
-            ],
-            software: [
-              "Herramientas específicas de la materia",
-              "Software de simulación"
+  const loadMateria = async () => {
+    if (!id) return
+
+    console.log('🔍 Cargando materia con ID:', id)
+    console.log('🔑 Estado de autenticación:', { isAuthenticated, hasToken: !!token })
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      // Verificar autenticación
+      if (!isAuthenticated || !token) {
+        console.log('❌ Usuario no autenticado o sin token')
+        setError('Debes iniciar sesión para ver los detalles de la materia')
+        setLoading(false)
+        return
+      }
+
+      // Cargar datos básicos de la materia
+      console.log('📡 Llamando a materiasService.getById...')
+      const materiaData = await materiasService.getById(parseInt(id))
+      console.log('📦 Respuesta completa del backend:', materiaData)
+      setMateria(materiaData.materia)
+      console.log('✅ Materia extraída:', materiaData.materia)
+
+      // Simular carga de contenido (en un caso real, esto vendría del backend)
+      const contenidoSimulado: ContenidoMateria = {
+        nombre: materiaData.materia.nombre,
+        codigo: materiaData.materia.codigo,
+        creditos: materiaData.materia.creditos,
+        horas: 48,
+        semestre: "2025-1",
+        descripcion: materiaData.materia.descripcion || "Descripción detallada de la materia",
+        objetivos: [
+          "Desarrollar competencias comunicativas básicas",
+          "Adquirir vocabulario esencial para la comunicación cotidiana",
+          "Comprender estructuras gramaticales fundamentales",
+          "Desarrollar habilidades de lectura y escritura básicas"
+        ],
+        unidades: [
+          {
+            numero: 1,
+            titulo: "Introducción y Fundamentos",
+            duracion: "2 semanas",
+            horas: 8,
+            temas: [
+              {
+                titulo: "Conceptos básicos",
+                descripcion: "Introducción a los conceptos fundamentales de la materia",
+                actividades: [
+                  "Lectura de material introductorio",
+                  "Ejercicios de aplicación",
+                  "Discusiones en grupo"
+                ],
+                recursos: [
+                  "Material de lectura",
+                  "Presentaciones",
+                  "Videos explicativos"
+                ]
+              }
             ]
           },
-          comisiones: [
-            {
-              id: 1,
-              numero: 1,
-              nombre: "Comisión 1 - Mañana",
-              horario: "Lunes y Miércoles 8:00-10:00",
-              aula: "Aula 101",
-              profesores: [
-                {
-                  id: 1,
-                  nombre: "María",
-                  apellido: "González",
-                  email: "maria.gonzalez@universidad.edu",
-                  especialidad: "Gramática"
-                },
-                {
-                  id: 2,
-                  nombre: "Carlos",
-                  apellido: "Rodríguez",
-                  email: "carlos.rodriguez@universidad.edu",
-                  especialidad: "Conversación"
-                }
-              ]
-            },
-            {
-              id: 2,
-              numero: 2,
-              nombre: "Comisión 2 - Tarde",
-              horario: "Martes y Jueves 14:00-16:00",
-              aula: "Aula 102",
-              profesores: [
-                {
-                  id: 3,
-                  nombre: "Ana",
-                  apellido: "Martínez",
-                  email: "ana.martinez@universidad.edu",
-                  especialidad: "Literatura"
-                }
-              ]
-            },
-            {
-              id: 3,
-              numero: 3,
-              nombre: "Comisión 3 - Noche",
-              horario: "Lunes y Miércoles 18:00-20:00",
-              aula: "Aula 103",
-              profesores: [
-                {
-                  id: 4,
-                  nombre: "Luis",
-                  apellido: "Pérez",
-                  email: "luis.perez@universidad.edu",
-                  especialidad: "Escritura"
-                },
-                {
-                  id: 5,
-                  nombre: "Laura",
-                  apellido: "Fernández",
-                  email: "laura.fernandez@universidad.edu",
-                  especialidad: "Pronunciación"
-                }
-              ]
-            }
+          {
+            numero: 2,
+            titulo: "Desarrollo de Competencias",
+            duracion: "3 semanas",
+            horas: 12,
+            temas: [
+              {
+                titulo: "Aplicación práctica",
+                descripcion: "Desarrollo de habilidades prácticas en la materia",
+                actividades: [
+                  "Ejercicios prácticos",
+                  "Proyectos individuales",
+                  "Evaluaciones formativas"
+                ],
+                recursos: [
+                  "Guías de práctica",
+                  "Herramientas digitales",
+                  "Material de apoyo"
+                ]
+              }
+            ]
+          }
+        ],
+        evaluacion: {
+          parcial1: {
+            porcentaje: 25,
+            fecha: "Semana 6",
+            contenido: "Unidades 1-2"
+          },
+          parcial2: {
+            porcentaje: 25,
+            fecha: "Semana 10",
+            contenido: "Unidades 2-3"
+          },
+          final: {
+            porcentaje: 30,
+            fecha: "Semana 14",
+            contenido: "Todo el curso"
+          },
+          participacion: {
+            porcentaje: 20,
+            descripcion: "Participación en clase y tareas"
+          }
+        },
+        recursos: {
+          bibliografia: [
+            "Libro de texto principal de la materia",
+            "Material complementario recomendado",
+            "Artículos académicos relevantes"
+          ],
+          plataformas: [
+            "Plataforma de aprendizaje virtual",
+            "Recursos digitales complementarios"
+          ],
+          software: [
+            "Herramientas específicas de la materia",
+            "Software de simulación"
           ]
-        }
-
-        setContenido(contenidoSimulado)
-        // Seleccionar la primera comisión por defecto
-        if (contenidoSimulado.comisiones.length > 0) {
-          setSelectedComision(contenidoSimulado.comisiones[0].id)
-        }
-      } catch (error: any) {
-        console.error('Error al cargar la materia:', error)
-        toast.error('Error al cargar los datos de la materia')
-      } finally {
-        setLoading(false)
+        },
+        comisiones: [
+          {
+            id: 1,
+            numero: 1,
+            nombre: "Comisión 1 - Mañana",
+            horario: "Lunes y Miércoles 8:00-10:00",
+            aula: "Aula 101",
+            profesores: [
+              {
+                id: 1,
+                nombre: "María",
+                apellido: "González",
+                email: "maria.gonzalez@universidad.edu",
+                especialidad: "Gramática"
+              },
+              {
+                id: 2,
+                nombre: "Carlos",
+                apellido: "Rodríguez",
+                email: "carlos.rodriguez@universidad.edu",
+                especialidad: "Conversación"
+              }
+            ]
+          },
+          {
+            id: 2,
+            numero: 2,
+            nombre: "Comisión 2 - Tarde",
+            horario: "Martes y Jueves 14:00-16:00",
+            aula: "Aula 102",
+            profesores: [
+              {
+                id: 3,
+                nombre: "Ana",
+                apellido: "Martínez",
+                email: "ana.martinez@universidad.edu",
+                especialidad: "Literatura"
+              }
+            ]
+          },
+          {
+            id: 3,
+            numero: 3,
+            nombre: "Comisión 3 - Noche",
+            horario: "Lunes y Miércoles 18:00-20:00",
+            aula: "Aula 103",
+            profesores: [
+              {
+                id: 4,
+                nombre: "Luis",
+                apellido: "Pérez",
+                email: "luis.perez@universidad.edu",
+                especialidad: "Escritura"
+              },
+              {
+                id: 5,
+                nombre: "Laura",
+                apellido: "Fernández",
+                email: "laura.fernandez@universidad.edu",
+                especialidad: "Pronunciación"
+              }
+            ]
+          }
+        ]
       }
+
+      setContenido(contenidoSimulado)
+      // Seleccionar la primera comisión por defecto
+      if (contenidoSimulado.comisiones.length > 0) {
+        setSelectedComision(contenidoSimulado.comisiones[0].id)
+      }
+    } catch (error: any) {
+      console.error('❌ Error al cargar la materia:', error)
+      console.error('📋 Detalles del error:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      })
+
+      let errorMessage = 'Error al cargar los datos de la materia'
+
+      if (error.response?.status === 401) {
+        errorMessage = 'Sesión expirada. Por favor, inicia sesión nuevamente.'
+        setShowReloginModal(true) // Mostrar modal de relogin
+      } else if (error.response?.status === 404) {
+        errorMessage = 'La materia no fue encontrada'
+      } else if (error.response?.status >= 500) {
+        errorMessage = 'Error del servidor. Intenta más tarde.'
+      }
+
+      setError(errorMessage)
+      toast.error(errorMessage)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Función para manejar el relogin
+  const handleRelogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!reloginCredentials.email || !reloginCredentials.password) {
+      toast.error('Por favor, completa todos los campos')
+      return
     }
 
-    loadMateria()
-  }, [id])
+    setReloginLoading(true)
+    try {
+      await login(reloginCredentials)
+      setShowReloginModal(false)
+      setReloginCredentials({ email: '', password: '' })
+      toast.success('¡Sesión renovada exitosamente!')
+
+      // Recargar la materia después del relogin exitoso
+      window.location.reload()
+    } catch (error: any) {
+      toast.error(error.message || 'Error al iniciar sesión')
+    } finally {
+      setReloginLoading(false)
+    }
+  }
+
+  // Función para cerrar el modal y redirigir al login
+  const handleRedirectToLogin = () => {
+    setShowReloginModal(false)
+    navigate('/login', { replace: true })
+  }
 
   const handleBack = () => {
     navigate('/materias')
@@ -304,6 +386,9 @@ export function MateriaDetailPage() {
 
   const selectedComisionData = contenido?.comisiones.find(c => c.id === selectedComision)
 
+  // Debug: mostrar estado actual
+  console.log('🎯 Render - Estado actual:', { materia, contenido, loading, error })
+
   if (loading) {
     return (
       <div className="text-center py-5">
@@ -311,6 +396,21 @@ export function MateriaDetailPage() {
           <span className="visually-hidden">Cargando...</span>
         </div>
         <p className="mt-3 text-muted">Cargando detalles de la materia...</p>
+      </div>
+    )
+  }
+
+  // Mostrar error si hay uno
+  if (error) {
+    return (
+      <div className="text-center py-5">
+        <ExclamationTriangleIcon className="w-16 h-16 text-warning mx-auto mb-3" />
+        <h4>Error al cargar la materia</h4>
+        <p className="text-muted">{error}</p>
+        <button className="btn btn-primary d-inline-flex align-items-center" onClick={handleBack}>
+          <ArrowLeftIcon className="w-4 h-4 me-2" />
+          Volver a Materias
+        </button>
       </div>
     )
   }
@@ -712,6 +812,46 @@ export function MateriaDetailPage() {
           )}
         </div>
       </div>
+
+      {/* Modal de relogin */}
+      {showReloginModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Sesión Expirada</h3>
+            <p>Tu sesión ha expirado. Por favor, inicia sesión nuevamente para continuar.</p>
+            <form onSubmit={handleRelogin}>
+              <div className="mb-3">
+                <label htmlFor="reloginEmail" className="form-label">Email:</label>
+                <input
+                  type="email"
+                  className="form-control"
+                  id="reloginEmail"
+                  value={reloginCredentials.email}
+                  onChange={(e) => setReloginCredentials({ ...reloginCredentials, email: e.target.value })}
+                  required
+                />
+              </div>
+              <div className="mb-3">
+                <label htmlFor="reloginPassword" className="form-label">Contraseña:</label>
+                <input
+                  type="password"
+                  className="form-control"
+                  id="reloginPassword"
+                  value={reloginCredentials.password}
+                  onChange={(e) => setReloginCredentials({ ...reloginCredentials, password: e.target.value })}
+                  required
+                />
+              </div>
+              <button type="submit" className="btn btn-primary" disabled={reloginLoading}>
+                {reloginLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+              </button>
+              <button type="button" className="btn btn-secondary ms-2" onClick={handleRedirectToLogin} disabled={reloginLoading}>
+                Cancelar
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

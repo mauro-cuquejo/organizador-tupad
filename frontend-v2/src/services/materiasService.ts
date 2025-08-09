@@ -28,6 +28,20 @@ export interface MateriasResponse {
   }
 }
 
+export interface MateriaDetailResponse {
+  materia: Materia
+  horarios: any[]
+  cronograma: any[]
+  evaluaciones: any[]
+  estadisticas: {
+    total_horarios: number
+    total_contenidos: number
+    total_evaluaciones: number
+    total_profesores: number
+    total_comisiones: number
+  }
+}
+
 export interface MateriasFilters {
   page?: number
   limit?: number
@@ -57,7 +71,7 @@ export const materiasService = {
   },
 
   // Obtener una materia específica
-  getById: async (id: number): Promise<Materia> => {
+  getById: async (id: number): Promise<MateriaDetailResponse> => {
     const response = await api.get(`/materias/${id}`)
     return response.data
   },
