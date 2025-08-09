@@ -316,13 +316,13 @@ export function MateriasPage() {
                   {(searchTerm || hasActiveFilters) && (
                     <div className="mt-3">
                       {searchTerm && (
-                        <button className="btn btn-outline-primary me-2" onClick={handleClearSearch}>
+                        <button className="btn btn-outline-primary me-2 py-2" onClick={handleClearSearch}>
                           <i className="bi bi-arrow-left me-2"></i>
                           Limpiar búsqueda
                         </button>
                       )}
                       {hasActiveFilters && (
-                        <button className="btn btn-outline-warning me-2" onClick={handleClearFilters}>
+                        <button className="btn btn-outline-warning me-2 py-2" onClick={handleClearFilters}>
                           <XMarkIcon className="w-4 h-4 me-2" />
                           Limpiar filtros
                         </button>
@@ -330,7 +330,7 @@ export function MateriasPage() {
                     </div>
                   )}
                   <div className="mt-3">
-                    <button className="btn btn-primary" onClick={handleCreateMateria}>
+                    <button className="btn btn-primary py-2" onClick={handleCreateMateria}>
                       <PlusIcon className="w-4 h-4 me-2" />
                       Crear primera materia
                     </button>
