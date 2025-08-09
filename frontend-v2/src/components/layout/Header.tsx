@@ -2,7 +2,7 @@ import { useAuthStore } from '@/stores/authStore'
 import { Link, useLocation } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { Popover } from '@headlessui/react'
-import { Fragment, useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   HomeIcon,
   CalendarIcon,
@@ -93,8 +93,8 @@ export function Header() {
   }
 
   const handleNavClick = (path: string) => {
-    // Si no es dashboard, mostrar toast de desarrollo
-    if (path !== '/dashboard') {
+    // Si no es dashboard o materias, mostrar toast de desarrollo
+    if (path !== '/dashboard' && path !== '/materias') {
       const label = path.replace('/', '').charAt(0).toUpperCase() + path.slice(2)
       toast(`${label} - Función en desarrollo`, {
         duration: 2000,

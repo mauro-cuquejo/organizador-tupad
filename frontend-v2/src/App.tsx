@@ -4,6 +4,7 @@ import { LoginPage } from './pages/auth/LoginPage'
 import { RegisterPage } from './pages/auth/RegisterPage'
 import { Layout } from './components/layout/Layout'
 import { DashboardPage } from './pages/dashboard/DashboardPage'
+import { MateriasPage } from './pages/materias/MateriasPage'
 import { LoadingSpinner } from './components/ui/LoadingSpinner'
 import { useEffect } from 'react'
 
@@ -41,6 +42,13 @@ function App() {
         element={isAuthenticated ? <Layout /> : <Navigate to="/login" replace />}
       >
         <Route index element={<DashboardPage />} />
+      </Route>
+
+      <Route
+        path="/materias"
+        element={isAuthenticated ? <Layout /> : <Navigate to="/login" replace />}
+      >
+        <Route index element={<MateriasPage />} />
       </Route>
 
       {/* Ruta por defecto */}

@@ -1,14 +1,11 @@
 import { useEffect, useState } from 'react'
-import { useAuthStore } from '@/stores/authStore'
+import { Link } from 'react-router-dom'
 import { dashboardService } from '@/services/dashboardService'
 import toast from 'react-hot-toast'
 import {
   BookOpenIcon,
-  ClockIcon,
-  UsersIcon,
   ChartBarIcon,
   CalendarIcon,
-  BellIcon,
   HomeIcon,
   ArrowPathIcon,
   ArrowDownTrayIcon,
@@ -26,7 +23,6 @@ interface DashboardStats {
 }
 
 export function DashboardPage() {
-  const { user } = useAuthStore()
   const [loading, setLoading] = useState(false)
   const [stats, setStats] = useState<DashboardStats>({
     totalMaterias: 0,
@@ -144,9 +140,9 @@ export function DashboardPage() {
                     </div>
                   </div>
                   <div className="stat-footer">
-                    <a href="#/materias" className="text-decoration-none">
+                    <Link to="/materias" className="text-decoration-none">
                       Ver todas <i className="bi bi-arrow-right"></i>
-                    </a>
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -165,9 +161,9 @@ export function DashboardPage() {
                     </div>
                   </div>
                   <div className="stat-footer">
-                    <a href="#/horarios" className="text-decoration-none">
+                    <Link to="/horarios" className="text-decoration-none">
                       Ver horarios <i className="bi bi-arrow-right"></i>
-                    </a>
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -186,9 +182,9 @@ export function DashboardPage() {
                     </div>
                   </div>
                   <div className="stat-footer">
-                    <a href="#/contenidos" className="text-decoration-none">
+                    <Link to="/contenidos" className="text-decoration-none">
                       Ver contenidos <i className="bi bi-arrow-right"></i>
-                    </a>
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -207,9 +203,9 @@ export function DashboardPage() {
                     </div>
                   </div>
                   <div className="stat-footer">
-                    <a href="#/evaluaciones" className="text-decoration-none">
+                    <Link to="/evaluaciones" className="text-decoration-none">
                       Ver evaluaciones <i className="bi bi-arrow-right"></i>
-                    </a>
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -229,10 +225,10 @@ export function DashboardPage() {
                 <div className="card-body">
                   <div className="row">
                     <div className="col-md-3 col-sm-6 mb-3">
-                      <button className="btn btn-outline-primary w-100">
+                      <Link to="/materias" className="btn btn-outline-primary w-100">
                         <i className="bi bi-plus-circle me-2"></i>
                         Nueva Materia
-                      </button>
+                      </Link>
                     </div>
                     <div className="col-md-3 col-sm-6 mb-3">
                       <button className="btn btn-outline-success w-100">
