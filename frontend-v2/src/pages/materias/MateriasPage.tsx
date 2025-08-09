@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useAuthStore } from '@/stores/authStore'
 import { materiasService, type Materia } from '@/services/materiasService'
 import toast from 'react-hot-toast'
@@ -21,8 +21,9 @@ export function MateriasPage() {
   const [totalPages, setTotalPages] = useState(1)
   const [totalMaterias, setTotalMaterias] = useState(0)
   const [showInactive, setShowInactive] = useState(false)
+  const [isSearching, setIsSearching] = useState(false)
 
-  const loadMaterias = async () => {
+  const loadMaterias = useCallback(async () => {
     setLoading(true)
     try {
       const params = {
@@ -41,26 +42,58 @@ export function MateriasPage() {
     } finally {
       setLoading(false)
     }
-  }
-
-  useEffect(() => {
-    loadMaterias()
   }, [currentPage, showInactive])
 
-  const handleSearch = async () => {
+  const searchMaterias = useCallback(async (query: string) => {
+    if (!query.trim()) {
+      setIsSearching(false)
+      loadMaterias()
+      return
+    }
+
+    setIsSearching(true)
+    setLoading(true)
+    try {
+      const searchResults = await materiasService.search(query)
+      setMaterias(searchResults)
+      setTotalPages(1)
+      setTotalMaterias(searchResults.length)
+    } catch (error: any) {
+      console.error('Error al buscar materias:', error)
+      toast.error('Error al buscar materias')
+      // Si falla la búsqueda, cargar todas las materias
+      loadMaterias()
+    } finally {
+      setLoading(false)
+      setIsSearching(false)
+    }
+  }, [loadMaterias])
+
+  useEffect(() => {
     if (searchTerm.trim()) {
-      setLoading(true)
-      try {
-        // Implementar búsqueda cuando esté disponible
-        toast.success(`Buscando: ${searchTerm}`)
-      } catch (error) {
-        toast.error('Error en la búsqueda')
-      } finally {
-        setLoading(false)
-      }
+      // Debounce para la búsqueda
+      const timeoutId = setTimeout(() => {
+        searchMaterias(searchTerm)
+      }, 500)
+
+      return () => clearTimeout(timeoutId)
     } else {
       loadMaterias()
     }
+  }, [searchTerm, searchMaterias, loadMaterias])
+
+  const handleSearch = () => {
+    if (searchTerm.trim()) {
+      searchMaterias(searchTerm)
+    } else {
+      loadMaterias()
+    }
+  }
+
+  const handleClearSearch = () => {
+    setSearchTerm('')
+    setCurrentPage(1)
+    setIsSearching(false)
   }
 
   const handleDelete = async (id: number, nombre: string) => {
@@ -68,7 +101,12 @@ export function MateriasPage() {
       try {
         await materiasService.delete(id)
         toast.success('Materia eliminada exitosamente')
-        loadMaterias()
+        // Recargar datos después de eliminar
+        if (searchTerm.trim()) {
+          searchMaterias(searchTerm)
+        } else {
+          loadMaterias()
+        }
       } catch (error: any) {
         console.error('Error al eliminar materia:', error)
         toast.error('Error al eliminar la materia')
@@ -100,6 +138,7 @@ export function MateriasPage() {
             </h1>
             <p className="page-subtitle">
               Administra las materias académicas ({totalMaterias} total)
+              {isSearching && <span className="ms-2 badge bg-info">Buscando...</span>}
             </p>
           </div>
           <div className="col-md-6 text-end">
@@ -139,12 +178,12 @@ export function MateriasPage() {
         <div className="card-body">
           <div className="row g-3">
             <div className="col-md-4">
-              <label className="form-label">Nombre</label>
+              <label className="form-label">Buscar por nombre o código</label>
               <div className="input-group">
                 <input
                   type="text"
                   className="form-control"
-                  placeholder="Buscar por nombre..."
+                  placeholder="Buscar materias..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
@@ -153,9 +192,19 @@ export function MateriasPage() {
                   className="btn btn-outline-secondary"
                   type="button"
                   onClick={handleSearch}
+                  disabled={loading}
                 >
                   <MagnifyingGlassIcon className="w-4 h-4" />
                 </button>
+                {searchTerm && (
+                  <button
+                    className="btn btn-outline-danger"
+                    type="button"
+                    onClick={handleClearSearch}
+                  >
+                    <i className="bi bi-x-lg"></i>
+                  </button>
+                )}
               </div>
             </div>
             <div className="col-md-3">
@@ -167,6 +216,7 @@ export function MateriasPage() {
                   id="showInactive"
                   checked={showInactive}
                   onChange={(e) => setShowInactive(e.target.checked)}
+                  disabled={isSearching}
                 />
                 <label className="form-check-label" htmlFor="showInactive">
                   Mostrar inactivas
@@ -175,7 +225,7 @@ export function MateriasPage() {
             </div>
             <div className="col-md-3">
               <label className="form-label">Créditos</label>
-              <select className="form-select">
+              <select className="form-select" disabled={isSearching}>
                 <option value="">Todos</option>
                 <option value="1-3">1-3 créditos</option>
                 <option value="4-6">4-6 créditos</option>
@@ -204,7 +254,9 @@ export function MateriasPage() {
           <div className="spinner-border text-primary" role="status">
             <span className="visually-hidden">Cargando...</span>
           </div>
-          <p className="mt-3 text-muted">Cargando materias...</p>
+          <p className="mt-3 text-muted">
+            {isSearching ? 'Buscando materias...' : 'Cargando materias...'}
+          </p>
         </div>
       )}
 
@@ -218,8 +270,14 @@ export function MateriasPage() {
                   <BookOpenIcon className="w-16 h-16 text-muted mb-3" />
                   <h4>No se encontraron materias</h4>
                   <p>
-                    {searchTerm ? 'No hay materias que coincidan con tu búsqueda.' : 'No hay materias registradas.'}
+                    {searchTerm ? `No hay materias que coincidan con "${searchTerm}".` : 'No hay materias registradas.'}
                   </p>
+                  {searchTerm && (
+                    <button className="btn btn-outline-primary me-2" onClick={handleClearSearch}>
+                      <i className="bi bi-arrow-left me-2"></i>
+                      Limpiar búsqueda
+                    </button>
+                  )}
                   <button className="btn btn-primary" onClick={handleCreateMateria}>
                     <PlusIcon className="w-4 h-4 me-2" />
                     Crear primera materia
@@ -235,28 +293,31 @@ export function MateriasPage() {
                     <h5 className="card-title mb-0">
                       <i className="bi bi-table me-2"></i>
                       Materias ({totalMaterias})
+                      {isSearching && <span className="ms-2 badge bg-info">Resultados de búsqueda</span>}
                     </h5>
                   </div>
                   <div className="col-md-6 text-end">
-                    <div className="btn-group" role="group">
-                      <button
-                        className="btn btn-outline-secondary"
-                        onClick={() => setCurrentPage(currentPage - 1)}
-                        disabled={currentPage === 1}
-                      >
-                        <i className="bi bi-chevron-left"></i>
-                      </button>
-                      <button className="btn btn-outline-primary" disabled>
-                        Página {currentPage} de {totalPages}
-                      </button>
-                      <button
-                        className="btn btn-outline-secondary"
-                        onClick={() => setCurrentPage(currentPage + 1)}
-                        disabled={currentPage >= totalPages}
-                      >
-                        <i className="bi bi-chevron-right"></i>
-                      </button>
-                    </div>
+                    {!isSearching && totalPages > 1 && (
+                      <div className="btn-group" role="group">
+                        <button
+                          className="btn btn-outline-secondary"
+                          onClick={() => setCurrentPage(currentPage - 1)}
+                          disabled={currentPage === 1}
+                        >
+                          <i className="bi bi-chevron-left"></i>
+                        </button>
+                        <button className="btn btn-outline-primary" disabled>
+                          Página {currentPage} de {totalPages}
+                        </button>
+                        <button
+                          className="btn btn-outline-secondary"
+                          onClick={() => setCurrentPage(currentPage + 1)}
+                          disabled={currentPage >= totalPages}
+                        >
+                          <i className="bi bi-chevron-right"></i>
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -337,7 +398,7 @@ export function MateriasPage() {
           )}
 
           {/* Paginación */}
-          {totalPages > 1 && (
+          {!isSearching && totalPages > 1 && (
             <nav className="mt-4">
               <ul className="pagination justify-content-center">
                 <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
@@ -358,7 +419,7 @@ export function MateriasPage() {
                     <i className="bi bi-chevron-left"></i>
                   </button>
                 </li>
-                
+
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                   <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
                     <button
@@ -369,7 +430,7 @@ export function MateriasPage() {
                     </button>
                   </li>
                 ))}
-                
+
                 <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
                   <button
                     className="page-link"
