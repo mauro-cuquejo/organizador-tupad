@@ -10,7 +10,15 @@ import {
   TrashIcon,
   EyeIcon,
   FunnelIcon,
-  XMarkIcon
+  XMarkIcon,
+  ArrowLeftIcon,
+  ArrowDownTrayIcon,
+  ArrowUpTrayIcon,
+  TableCellsIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ChevronDoubleLeftIcon,
+  ChevronDoubleRightIcon
 } from '@heroicons/react/24/outline'
 
 export function MateriasPage() {
@@ -176,14 +184,14 @@ export function MateriasPage() {
               className="btn btn-outline-light me-2"
               onClick={() => toast.success('Función de exportar - En desarrollo')}
             >
-              <i className="bi bi-download me-2"></i>
+              <ArrowDownTrayIcon className="w-4 h-4 me-2" />
               Exportar
             </button>
             <button
               className="btn btn-outline-light"
               onClick={() => toast.success('Función de importar - En desarrollo')}
             >
-              <i className="bi bi-upload me-2"></i>
+              <ArrowUpTrayIcon className="w-4 h-4 me-2" />
               Importar
             </button>
           </div>
@@ -237,7 +245,7 @@ export function MateriasPage() {
                     type="button"
                     onClick={handleClearSearch}
                   >
-                    <i className="bi bi-x-lg"></i>
+                    <XMarkIcon className="w-4 h-4" />
                   </button>
                 )}
               </div>
@@ -317,7 +325,7 @@ export function MateriasPage() {
                     <div className="mt-3">
                       {searchTerm && (
                         <button className="btn btn-outline-primary me-2 d-inline-flex align-items-center" style={{ height: '38px' }} onClick={handleClearSearch}>
-                          <i className="bi bi-arrow-left me-2"></i>
+                          <ArrowLeftIcon className="w-4 h-4 me-2" />
                           Limpiar búsqueda
                         </button>
                       )}
@@ -344,7 +352,7 @@ export function MateriasPage() {
                 <div className="row align-items-center">
                   <div className="col-md-6">
                     <h5 className="card-title mb-0">
-                      <i className="bi bi-table me-2"></i>
+                      <TableCellsIcon className="w-5 h-5 me-2" />
                       Materias ({totalMaterias})
                       {isSearching && <span className="ms-2 badge bg-info">Resultados de búsqueda</span>}
                       {hasActiveFilters && <span className="ms-2 badge bg-warning">Filtros aplicados</span>}
@@ -358,7 +366,7 @@ export function MateriasPage() {
                           onClick={() => setCurrentPage(currentPage - 1)}
                           disabled={currentPage === 1}
                         >
-                          <i className="bi bi-chevron-left"></i>
+                          <ChevronLeftIcon className="w-4 h-4" />
                         </button>
                         <button className="btn btn-outline-primary" disabled>
                           Página {currentPage} de {totalPages}
@@ -368,7 +376,7 @@ export function MateriasPage() {
                           onClick={() => setCurrentPage(currentPage + 1)}
                           disabled={currentPage >= totalPages}
                         >
-                          <i className="bi bi-chevron-right"></i>
+                          <ChevronRightIcon className="w-4 h-4" />
                         </button>
                       </div>
                     )}
@@ -461,7 +469,7 @@ export function MateriasPage() {
                     onClick={() => setCurrentPage(1)}
                     disabled={currentPage === 1}
                   >
-                    <i className="bi bi-chevron-double-left"></i>
+                    <ChevronDoubleLeftIcon className="w-4 h-4" />
                   </button>
                 </li>
                 <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
@@ -470,7 +478,7 @@ export function MateriasPage() {
                     onClick={() => setCurrentPage(currentPage - 1)}
                     disabled={currentPage === 1}
                   >
-                    <i className="bi bi-chevron-left"></i>
+                    <ChevronLeftIcon className="w-4 h-4" />
                   </button>
                 </li>
 
@@ -491,7 +499,7 @@ export function MateriasPage() {
                     onClick={() => setCurrentPage(currentPage + 1)}
                     disabled={currentPage === totalPages}
                   >
-                    <i className="bi bi-chevron-right"></i>
+                    <ChevronRightIcon className="w-4 h-4" />
                   </button>
                 </li>
                 <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
@@ -500,7 +508,7 @@ export function MateriasPage() {
                     onClick={() => setCurrentPage(totalPages)}
                     disabled={currentPage === totalPages}
                   >
-                    <i className="bi bi-chevron-double-right"></i>
+                    <ChevronDoubleRightIcon className="w-4 h-4" />
                   </button>
                 </li>
               </ul>
