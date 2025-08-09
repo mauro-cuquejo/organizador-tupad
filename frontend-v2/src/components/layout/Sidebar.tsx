@@ -1,23 +1,23 @@
 import { NavLink } from 'react-router-dom'
 import {
-  LayoutDashboard,
-  BookOpen,
-  Clock,
-  Users,
-  FileText,
-  BarChart3,
-  Bell
-} from 'lucide-react'
+  HomeIcon,
+  BookOpenIcon,
+  ClockIcon,
+  UserGroupIcon,
+  DocumentTextIcon,
+  ChartBarIcon,
+  BellIcon
+} from '@heroicons/react/24/outline'
 import { cn } from '@/utils/cn'
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Materias', href: '/materias', icon: BookOpen },
-  { name: 'Horarios', href: '/horarios', icon: Clock },
-  { name: 'Profesores', href: '/profesores', icon: Users },
-  { name: 'Contenidos', href: '/contenidos', icon: FileText },
-  { name: 'Estadísticas', href: '/estadisticas', icon: BarChart3 },
-  { name: 'Notificaciones', href: '/notificaciones', icon: Bell },
+  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
+  { name: 'Materias', href: '/materias', icon: BookOpenIcon },
+  { name: 'Horarios', href: '/horarios', icon: ClockIcon },
+  { name: 'Profesores', href: '/profesores', icon: UserGroupIcon },
+  { name: 'Contenidos', href: '/contenidos', icon: DocumentTextIcon },
+  { name: 'Estadísticas', href: '/estadisticas', icon: ChartBarIcon },
+  { name: 'Notificaciones', href: '/notificaciones', icon: BellIcon },
 ]
 
 export function Sidebar() {
@@ -38,14 +38,7 @@ export function Sidebar() {
                 )
               }
             >
-              <item.icon
-                className={({ isActive }: { isActive: boolean }) =>
-                  cn(
-                    'mr-3 flex-shrink-0 h-6 w-6',
-                    isActive ? 'text-primary-500' : 'text-gray-400 group-hover:text-gray-500'
-                  )
-                }
-              />
+              <item.icon className="mr-3 flex-shrink-0 h-6 w-6 text-gray-400 group-hover:text-gray-500" />
               {item.name}
             </NavLink>
           ))}

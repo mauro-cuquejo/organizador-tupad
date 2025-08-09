@@ -5,6 +5,7 @@ import { RegisterPage } from './pages/auth/RegisterPage'
 import { Layout } from './components/layout/Layout'
 import { DashboardPage } from './pages/dashboard/DashboardPage'
 import { MateriasPage } from './pages/materias/MateriasPage'
+import { MateriaDetailPage } from './pages/materias/MateriaDetailPage'
 import { LoadingSpinner } from './components/ui/LoadingSpinner'
 import { useEffect } from 'react'
 
@@ -49,6 +50,7 @@ function App() {
         element={isAuthenticated ? <Layout /> : <Navigate to="/login" replace />}
       >
         <Route index element={<MateriasPage />} />
+        <Route path=":id" element={<MateriaDetailPage />} />
       </Route>
 
       {/* Ruta por defecto */}

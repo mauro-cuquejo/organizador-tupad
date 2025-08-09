@@ -1,0 +1,199 @@
+{
+  "nombre": "Inglés I",
+  "codigo": "ING001",
+  "creditos": 3,
+  "horas": 48,
+  "docente": "Por asignar",
+  "semestre": "2025-1",
+  "descripcion": "Curso de inglés nivel básico para estudiantes universitarios",
+  "objetivos": [
+    "Desarrollar competencias comunicativas básicas en inglés",
+    "Adquirir vocabulario esencial para la comunicación cotidiana",
+    "Comprender estructuras gramaticales fundamentales",
+    "Desarrollar habilidades de lectura y escritura básicas"
+  ],
+  "unidades": [
+    {
+      "numero": 1,
+      "titulo": "Introducción al Inglés Básico",
+      "duracion": "2 semanas",
+      "horas": 8,
+      "temas": [
+        {
+          "titulo": "Saludos y presentaciones",
+          "descripcion": "Aprender a saludar y presentarse en inglés",
+          "actividades": [
+            "Diálogos de presentación",
+            "Práctica de pronunciación",
+            "Ejercicios de vocabulario"
+          ],
+          "recursos": [
+            "Audios de pronunciación",
+            "Tarjetas de vocabulario",
+            "Presentaciones en PowerPoint"
+          ]
+        },
+        {
+          "titulo": "Alfabeto y números",
+          "descripcion": "Conocer el alfabeto inglés y números del 1 al 100",
+          "actividades": [
+            "Dictado de letras y números",
+            "Juegos de memoria",
+            "Ejercicios de escritura"
+          ],
+          "recursos": [
+            "Videos del alfabeto",
+            "Aplicaciones interactivas",
+            "Material impreso"
+          ]
+        }
+      ]
+    },
+    {
+      "numero": 2,
+      "titulo": "Gramática Básica",
+      "duracion": "3 semanas",
+      "horas": 12,
+      "temas": [
+        {
+          "titulo": "Verbo 'To Be'",
+          "descripcion": "Uso del verbo ser/estar en presente",
+          "actividades": [
+            "Ejercicios de conjugación",
+            "Construcción de oraciones",
+            "Práctica oral"
+          ],
+          "recursos": [
+            "Tablas de conjugación",
+            "Ejercicios interactivos",
+            "Videos explicativos"
+          ]
+        },
+        {
+          "titulo": "Artículos y sustantivos",
+          "descripcion": "Uso de artículos (a, an, the) y plurales",
+          "actividades": [
+            "Identificación de artículos",
+            "Formación de plurales",
+            "Ejercicios de completar"
+          ],
+          "recursos": [
+            "Reglas gramaticales",
+            "Ejercicios en línea",
+            "Material de apoyo"
+          ]
+        }
+      ]
+    },
+    {
+      "numero": 3,
+      "titulo": "Comunicación Cotidiana",
+      "duracion": "3 semanas",
+      "horas": 12,
+      "temas": [
+        {
+          "titulo": "Conversaciones básicas",
+          "descripcion": "Desarrollar habilidades conversacionales básicas",
+          "actividades": [
+            "Role-plays",
+            "Diálogos guiados",
+            "Práctica en parejas"
+          ],
+          "recursos": [
+            "Scripts de diálogos",
+            "Audios de referencia",
+            "Guías de conversación"
+          ]
+        },
+        {
+          "titulo": "Descripción de personas y lugares",
+          "descripcion": "Aprender a describir características físicas y lugares",
+          "actividades": [
+            "Descripción de fotos",
+            "Presentación de lugares",
+            "Ejercicios de vocabulario descriptivo"
+          ],
+          "recursos": [
+            "Imágenes de referencia",
+            "Lista de adjetivos",
+            "Ejemplos de descripciones"
+          ]
+        }
+      ]
+    },
+    {
+      "numero": 4,
+      "titulo": "Lectura y Escritura",
+      "duracion": "2 semanas",
+      "horas": 8,
+      "temas": [
+        {
+          "titulo": "Comprensión lectora",
+          "descripcion": "Desarrollar habilidades de lectura comprensiva",
+          "actividades": [
+            "Lectura de textos cortos",
+            "Preguntas de comprensión",
+            "Resúmenes escritos"
+          ],
+          "recursos": [
+            "Textos adaptados",
+            "Ejercicios de comprensión",
+            "Guías de lectura"
+          ]
+        },
+        {
+          "titulo": "Escritura básica",
+          "descripcion": "Aprender a escribir textos simples en inglés",
+          "actividades": [
+            "Escritura de oraciones",
+            "Composición de párrafos",
+            "Corrección de textos"
+          ],
+          "recursos": [
+            "Modelos de escritura",
+            "Rubricas de evaluación",
+            "Herramientas de corrección"
+          ]
+        }
+      ]
+    }
+  ],
+  "evaluacion": {
+    "parcial1": {
+      "porcentaje": 25,
+      "fecha": "Semana 6",
+      "contenido": "Unidades 1-2"
+    },
+    "parcial2": {
+      "porcentaje": 25,
+      "fecha": "Semana 10",
+      "contenido": "Unidades 2-3"
+    },
+    "final": {
+      "porcentaje": 30,
+      "fecha": "Semana 14",
+      "contenido": "Todo el curso"
+    },
+    "participacion": {
+      "porcentaje": 20,
+      "descripcion": "Participación en clase y tareas"
+    }
+  },
+  "recursos": {
+    "bibliografia": [
+      "Basic English Grammar by Betty Schrampfer Azar",
+      "English File Elementary by Clive Oxenden",
+      "Essential Grammar in Use by Raymond Murphy"
+    ],
+    "plataformas": [
+      "Duolingo",
+      "BBC Learning English",
+      "English Central"
+    ],
+    "software": [
+      "Grammarly",
+      "Cambridge Dictionary",
+      "Oxford Learner's Dictionary"
+    ]
+  }
+}

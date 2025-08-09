@@ -1,5 +1,5 @@
 import { api } from './api'
-import { LoginCredentials, RegisterData, User } from '@/stores/authStore'
+import { LoginCredentials, RegisterData, User } from '@/types'
 
 export interface LoginResponse {
   success: boolean

@@ -1,4 +1,5 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/stores/authStore'
 import { materiasService, type Materia, type MateriasFilters } from '@/services/materiasService'
 import toast from 'react-hot-toast'
@@ -6,12 +7,11 @@ import {
   BookOpenIcon,
   PlusIcon,
   MagnifyingGlassIcon,
-  PencilIcon,
-  TrashIcon,
-  EyeIcon,
   FunnelIcon,
   XMarkIcon,
-  ArrowLeftIcon,
+  EyeIcon,
+  PencilIcon,
+  TrashIcon,
   ArrowDownTrayIcon,
   ArrowUpTrayIcon,
   TableCellsIcon,
@@ -22,6 +22,7 @@ import {
 } from '@heroicons/react/24/outline'
 
 export function MateriasPage() {
+  const navigate = useNavigate()
   const { user } = useAuthStore()
   const [materias, setMaterias] = useState<Materia[]>([])
   const [loading, setLoading] = useState(false)
@@ -113,11 +114,6 @@ export function MateriasPage() {
     setIsSearching(false)
   }
 
-  const handleClearFilters = () => {
-    setCreditosFilter('')
-    setCurrentPage(1)
-  }
-
   const handleClearAll = () => {
     setCreditosFilter('')
     setSearchTerm('')
@@ -157,7 +153,7 @@ export function MateriasPage() {
   }
 
   const handleViewMateria = (id: number) => {
-    toast.success(`Viendo materia ${id} - En desarrollo`)
+    navigate(`/materias/${id}`)
   }
 
   // Verificar si hay filtros activos
