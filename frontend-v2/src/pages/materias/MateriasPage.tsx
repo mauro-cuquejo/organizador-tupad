@@ -118,6 +118,13 @@ export function MateriasPage() {
     setCurrentPage(1)
   }
 
+  const handleClearAll = () => {
+    setCreditosFilter('')
+    setSearchTerm('')
+    setCurrentPage(1)
+    setIsSearching(false)
+  }
+
   const handleFilterChange = () => {
     setCurrentPage(1)
     // Los filtros se aplicarán automáticamente en el useEffect
@@ -154,7 +161,7 @@ export function MateriasPage() {
   }
 
   // Verificar si hay filtros activos
-  const hasActiveFilters = creditosFilter
+  const hasActiveFilters = creditosFilter || searchTerm.trim()
 
   return (
     <div className="materias-page">
@@ -209,10 +216,10 @@ export function MateriasPage() {
             {hasActiveFilters && (
               <button
                 className="btn btn-outline-danger btn-sm"
-                onClick={handleClearFilters}
+                onClick={handleClearAll}
               >
                 <XMarkIcon className="w-4 h-4 me-1" />
-                Limpiar Filtros
+                Limpiar
               </button>
             )}
           </div>
@@ -321,20 +328,12 @@ export function MateriasPage() {
                      hasActiveFilters ? 'No hay materias que coincidan con los filtros aplicados.' :
                      'No hay materias registradas.'}
                   </p>
-                  {(searchTerm || hasActiveFilters) && (
+                  {hasActiveFilters && (
                     <div className="mt-3">
-                      {searchTerm && (
-                        <button className="btn btn-outline-primary me-2 d-inline-flex align-items-center" style={{ height: '38px' }} onClick={handleClearSearch}>
-                          <ArrowLeftIcon className="w-4 h-4 me-2" />
-                          Limpiar búsqueda
-                        </button>
-                      )}
-                      {hasActiveFilters && (
-                        <button className="btn btn-outline-warning me-2 d-inline-flex align-items-center" style={{ height: '38px' }} onClick={handleClearFilters}>
-                          <XMarkIcon className="w-4 h-4 me-2" />
-                          Limpiar filtros
-                        </button>
-                      )}
+                      <button className="btn btn-outline-primary me-2 d-inline-flex align-items-center" style={{ height: '38px' }} onClick={handleClearAll}>
+                        <XMarkIcon className="w-4 h-4 me-2" />
+                        Limpiar
+                      </button>
                     </div>
                   )}
                   <div className="mt-3">
