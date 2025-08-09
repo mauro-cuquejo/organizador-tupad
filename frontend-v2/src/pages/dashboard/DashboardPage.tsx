@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useAuthStore } from '@/stores/authStore'
+import { dashboardService } from '@/services/dashboardService'
+import toast from 'react-hot-toast'
 import {
   BookOpenIcon,
   ClockIcon,
@@ -35,27 +37,45 @@ export function DashboardPage() {
     proximasClases: 0,
   })
 
-  useEffect(() => {
-    // Simular carga de datos
+  const loadDashboardStats = async () => {
     setLoading(true)
-    setTimeout(() => {
+    try {
+      // Cargar estadísticas del dashboard desde el backend
+      const dashboardStats = await dashboardService.getStats()
+
       setStats({
-        totalMaterias: 12,
-        totalHorarios: 48,
-        totalContenidos: 25,
-        totalEvaluaciones: 8,
-        evaluacionesPendientes: 3,
-        proximasClases: 5,
+        totalMaterias: dashboardStats.total_materias,
+        totalHorarios: dashboardStats.total_horarios,
+        totalContenidos: dashboardStats.total_contenidos,
+        totalEvaluaciones: dashboardStats.total_evaluaciones,
+        evaluacionesPendientes: dashboardStats.evaluaciones_proximas,
+        proximasClases: dashboardStats.contenidos_recientes,
       })
+    } catch (error: any) {
+      console.error('Error al cargar estadísticas del dashboard:', error)
+
+      // Mostrar detalles del error
+      if (error.response) {
+        console.error('Response data:', error.response.data)
+        console.error('Response status:', error.response.status)
+        toast.error(`Error ${error.response.status}: ${error.response.data?.error || error.message}`)
+      } else if (error.request) {
+        console.error('Request error:', error.request)
+        toast.error('Error de conexión con el servidor')
+      } else {
+        toast.error('Error al cargar estadísticas del dashboard')
+      }
+    } finally {
       setLoading(false)
-    }, 1000)
+    }
+  }
+
+  useEffect(() => {
+    loadDashboardStats()
   }, [])
 
   const refreshDashboard = () => {
-    setLoading(true)
-    setTimeout(() => {
-      setLoading(false)
-    }, 1000)
+    loadDashboardStats()
   }
 
   const exportReport = () => {
