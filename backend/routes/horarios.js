@@ -1,7 +1,7 @@
 const express = require('express');
 const { db } = require('../database/init');
 const { authenticateToken, isProfesor } = require('../middleware/auth');
-const { validateHorario, validateId, validateFiltrosHorarios, validatePagination } = require('../middleware/validation');
+const { validateHorario, validateId, validateMateriaId, validateFiltrosHorarios, validatePagination } = require('../middleware/validation');
 const materiaNotificationService = require('../services/materiaNotificationService');
 
 const router = express.Router();
@@ -161,7 +161,7 @@ router.get('/dia/:dia', authenticateToken, (req, res) => {
 });
 
 // Obtener horarios por materia
-router.get('/materia/:materiaId', authenticateToken, validateId, (req, res) => {
+router.get('/materia/:materiaId', authenticateToken, validateMateriaId, (req, res) => {
     const materiaId = req.params.materiaId;
 
     const query = `

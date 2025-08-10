@@ -1,7 +1,7 @@
 const express = require('express');
 const { db } = require('../database/init');
 const { authenticateToken, isProfesor } = require('../middleware/auth');
-const { validateContenido, validateId, validateFiltrosContenidos, validatePagination } = require('../middleware/validation');
+const { validateContenido, validateId, validateMateriaId, validateFiltrosContenidos, validatePagination } = require('../middleware/validation');
 const emailService = require('../services/emailService');
 const contenidoNotificationService = require('../services/contenidoNotificationService');
 
@@ -526,7 +526,7 @@ router.get('/stats/overview', authenticateToken, (req, res) => {
 });
 
 // Obtener contenidos por materia
-router.get('/materia/:materiaId', authenticateToken, validateId, (req, res) => {
+router.get('/materia/:materiaId', authenticateToken, validateMateriaId, (req, res) => {
     const materiaId = req.params.materiaId;
 
     // Verificar que la materia existe

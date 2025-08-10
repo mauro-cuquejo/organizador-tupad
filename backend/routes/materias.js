@@ -473,6 +473,74 @@ router.get('/:id/evaluaciones', authenticateToken, validateId, (req, res) => {
     });
 });
 
+// Obtener objetivos de una materia
+router.get('/:id/objetivos', authenticateToken, validateId, (req, res) => {
+    const materiaId = req.params.id;
+
+    // Verificar que la materia existe
+    db.get('SELECT id, nombre, codigo FROM materias WHERE id = ? AND activo = 1', [materiaId], (err, materia) => {
+        if (err) {
+            return res.status(500).json({ error: 'Error interno del servidor' });
+        }
+
+        if (!materia) {
+            return res.status(404).json({ error: 'Materia no encontrada' });
+        }
+
+        const query = `
+      SELECT id, descripcion, orden
+      FROM objetivos_materia
+      WHERE materia_id = ? AND activo = 1
+      ORDER BY orden
+    `;
+
+        db.all(query, [materiaId], (err, objetivos) => {
+            if (err) {
+                return res.status(500).json({ error: 'Error interno del servidor' });
+            }
+
+            res.json({
+                materia,
+                objetivos
+            });
+        });
+    });
+});
+
+// Obtener recursos de una materia
+router.get('/:id/recursos', authenticateToken, validateId, (req, res) => {
+    const materiaId = req.params.id;
+
+    // Verificar que la materia existe
+    db.get('SELECT id, nombre, codigo FROM materias WHERE id = ? AND activo = 1', [materiaId], (err, materia) => {
+        if (err) {
+            return res.status(500).json({ error: 'Error interno del servidor' });
+        }
+
+        if (!materia) {
+            return res.status(404).json({ error: 'Materia no encontrada' });
+        }
+
+        const query = `
+      SELECT id, tipo, nombre, descripcion, link, orden
+      FROM recursos_materia
+      WHERE materia_id = ? AND activo = 1
+      ORDER BY orden
+    `;
+
+        db.all(query, [materiaId], (err, recursos) => {
+            if (err) {
+                return res.status(500).json({ error: 'Error interno del servidor' });
+            }
+
+            res.json({
+                materia,
+                recursos
+            });
+        });
+    });
+});
+
 // Crear nueva materia (solo profesores y admin)
 router.post('/', authenticateToken, isProfesor, validateMateria, (req, res) => {
     const { nombre, codigo, descripcion, creditos } = req.body;

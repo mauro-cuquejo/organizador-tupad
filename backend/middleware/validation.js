@@ -88,6 +88,11 @@ const validateId = [
     handleValidationErrors
 ];
 
+const validateMateriaId = [
+    param('materiaId').isInt().withMessage('ID de materia inválido'),
+    handleValidationErrors
+];
+
 // Validaciones para filtros
 const validateFiltrosHorarios = [
     query('dia_semana').optional().isInt({ min: 1, max: 7 }).withMessage('Día de semana debe ser entre 1 y 7'),
@@ -114,6 +119,7 @@ module.exports = {
     validateEvaluacion,
     validatePagination,
     validateId,
+    validateMateriaId,
     validateFiltrosHorarios,
     validateFiltrosContenidos
 };
