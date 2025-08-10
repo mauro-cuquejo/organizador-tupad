@@ -681,7 +681,7 @@ router.get('/search/:query', authenticateToken, (req, res) => {
 });
 
 // Obtener estadísticas de evaluaciones
-router.get('/stats', authenticateToken, (req, res) => {
+router.get('/stats', (req, res) => {
     const query = `
         SELECT
             COUNT(*) as total_evaluaciones,

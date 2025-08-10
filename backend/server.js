@@ -3,7 +3,14 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const http = require('http');
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
+
+// Fallback para variables de entorno si dotenv falla
+if (!process.env.PORT) process.env.PORT = '3001';
+if (!process.env.NODE_ENV) process.env.NODE_ENV = 'development';
+if (!process.env.RABBITMQ_ENABLED) process.env.RABBITMQ_ENABLED = 'false';
+if (!process.env.JWT_SECRET) process.env.JWT_SECRET = 'jwt_secret_fallback_para_desarrollo';
 
 const authRoutes = require('./routes/auth');
 const usuariosRoutes = require('./routes/usuarios');
@@ -23,6 +30,15 @@ const amqpService = require('./services/amqpService');
 const app = express();
 const server = http.createServer(app);
 const PORT = process.env.PORT || 3000;
+
+// Log para debug de variables de entorno
+console.log('🔧 Variables de entorno cargadas:');
+console.log(`   - PORT: ${process.env.PORT}`);
+console.log(`   - NODE_ENV: ${process.env.NODE_ENV}`);
+console.log(`   - RABBITMQ_ENABLED: ${process.env.RABBITMQ_ENABLED}`);
+console.log(`   - JWT_SECRET: ${process.env.JWT_SECRET ? '✅ Configurado' : '❌ NO configurado'}`);
+console.log(`   - Puerto final: ${PORT}`);
+console.log('');
 
 // Configuración de seguridad - Helmet deshabilitado temporalmente para desarrollo
 // app.use(helmet());
@@ -100,14 +116,19 @@ async function startServer() {
         await initializeDatabase();
         console.log('✅ Base de datos inicializada correctamente');
 
-        // Inicializar AMQP
-        await amqpService.initialize();
-        console.log('✅ Servicio AMQP inicializado correctamente');
+        // Inicializar AMQP solo si está habilitado
+        if (process.env.RABBITMQ_ENABLED === 'true') {
+            await amqpService.initialize();
+            console.log('✅ Servicio AMQP inicializado correctamente');
 
-        // Inicializar consumidores AMQP para notificaciones
-        console.log('✅ Consumidores AMQP inicializados correctamente');
+            // Inicializar consumidores AMQP para notificaciones
+            console.log('✅ Consumidores AMQP inicializados correctamente');
+        } else {
+            console.log('⏭️  RabbitMQ deshabilitado (RABBITMQ_ENABLED=false)');
+        }
 
         // Arrancar servidor
+        console.log(`🔧 Intentando iniciar servidor en puerto ${PORT}...`);
         server.listen(PORT, () => {
             console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
             console.log(`🌍 Ambiente: ${process.env.NODE_ENV}`);
@@ -130,9 +151,11 @@ async function gracefulShutdown() {
     console.log('\n🛑 Recibida señal de cierre, cerrando servidor...');
 
     try {
-        // Cerrar AMQP
-        await amqpService.close();
-        console.log('✅ AMQP cerrado');
+        // Cerrar AMQP solo si está habilitado
+        if (process.env.RABBITMQ_ENABLED === 'true') {
+            await amqpService.close();
+            console.log('✅ AMQP cerrado');
+        }
 
         // Cerrar servidor HTTP
         server.close(() => {
