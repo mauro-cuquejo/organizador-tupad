@@ -3,7 +3,7 @@
 angular.module('tupadApp')
     .service('ApiService', ['$http', '$q', 'localStorageService', 'CacheService', 'AdBlockDetectorService', function ($http, $q, localStorageService, CacheService, AdBlockDetectorService) {
 
-        const API_BASE_URL = 'http://localhost:3000/api';
+        const API_BASE_URL = 'http://localhost:3001/api';
 
         // Configuración base de HTTP
         const httpConfig = {
