@@ -1,14 +1,22 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios'
 import { useAuthStore } from '@/stores/authStore'
 import toast from 'react-hot-toast'
+import { config, debugLog } from '@/config'
 
 // Crear instancia de axios
 const api: AxiosInstance = axios.create({
-  baseURL: '/api', // Usar proxy de Vite
+  baseURL: config.api.baseURL,
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000,
+  timeout: config.api.timeout,
+})
+
+// Log de configuración en desarrollo
+debugLog('API Configurada con:', {
+  baseURL: config.api.baseURL,
+  timeout: config.api.timeout,
+  environment: config.app.environment
 })
 
 // Interceptor para agregar token a las peticiones

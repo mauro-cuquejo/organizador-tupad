@@ -1,4 +1,5 @@
 import { api } from './api'
+import { config, debugLog } from '@/config'
 
 export interface MateriaStats {
   total_materias: number
@@ -54,26 +55,44 @@ export interface MateriasFilters {
 export const materiasService = {
   // Obtener estadísticas de materias
   getStats: async (): Promise<MateriaStats> => {
-    const response = await api.get('/materias/stats')
+    const response = await api.get('/api/materias/stats')
     return response.data.stats
   },
 
   // Obtener todas las materias con paginación y filtros
   getAll: async (params?: MateriasFilters): Promise<MateriasResponse> => {
-    const response = await api.get('/materias', { params })
+    const response = await api.get('/api/materias', { params })
     return response.data
   },
 
   // Buscar materias por nombre o código
   search: async (query: string): Promise<Materia[]> => {
-    const response = await api.get(`/materias/search/${encodeURIComponent(query)}`)
+    const response = await api.get(`/api/materias/search/${encodeURIComponent(query)}`)
     return response.data.materias
   },
 
   // Obtener una materia específica
   getById: async (id: number): Promise<MateriaDetailResponse> => {
-    const response = await api.get(`/materias/${id}`)
+    const response = await api.get(`/api/materias/${id}`)
     return response.data
+  },
+
+  // Obtener objetivos de una materia
+  getObjetivos: async (materiaId: number): Promise<any[]> => {
+    const response = await api.get(`/api/materias/${materiaId}/objetivos`)
+    return response.data.objetivos
+  },
+
+  // Obtener recursos de una materia
+  getRecursos: async (materiaId: number): Promise<any[]> => {
+    const response = await api.get(`/api/materias/${materiaId}/recursos`)
+    return response.data.recursos
+  },
+
+  // Obtener contenidos de una materia
+  getContenidos: async (materiaId: number): Promise<any[]> => {
+    const response = await api.get(`/api/contenidos/materia/${materiaId}`)
+    return response.data.contenidos
   },
 
   // Crear nueva materia
@@ -83,18 +102,18 @@ export const materiasService = {
     descripcion: string
     creditos: number
   }): Promise<Materia> => {
-    const response = await api.post('/materias', materia)
+    const response = await api.post('/api/materias', materia)
     return response.data
   },
 
   // Actualizar materia
   update: async (id: number, materia: Partial<Materia>): Promise<Materia> => {
-    const response = await api.put(`/materias/${id}`, materia)
+    const response = await api.put(`/api/materias/${id}`, materia)
     return response.data
   },
 
   // Eliminar materia
   delete: async (id: number): Promise<void> => {
-    await api.delete(`/materias/${id}`)
+    await api.delete(`/api/materias/${id}`)
   }
 }

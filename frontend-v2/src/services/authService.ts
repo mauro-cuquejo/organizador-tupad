@@ -17,7 +17,7 @@ export interface RegisterResponse {
 export const authService = {
   async login(credentials: LoginCredentials): Promise<LoginResponse> {
     try {
-      const response = await api.post('/auth/login', credentials)
+      const response = await api.post('/api/auth/login', credentials)
       return response.data
     } catch (error: any) {
       console.error('Error en login:', error)
@@ -27,7 +27,7 @@ export const authService = {
 
   async register(data: RegisterData): Promise<RegisterResponse> {
     try {
-      const response = await api.post('/auth/register', data)
+      const response = await api.post('/api/auth/register', data)
       return response.data
     } catch (error: any) {
       console.error('Error en registro:', error)
@@ -37,7 +37,7 @@ export const authService = {
 
   async getProfile(): Promise<User> {
     try {
-      const response = await api.get('/auth/profile')
+      const response = await api.get('/api/auth/profile')
       return response.data
     } catch (error: any) {
       console.error('Error obteniendo perfil:', error)
@@ -47,7 +47,7 @@ export const authService = {
 
   async logout(): Promise<void> {
     try {
-      await api.post('/auth/logout')
+      await api.post('/api/auth/logout')
     } catch (error: any) {
       console.error('Error en logout:', error)
       // No lanzamos error en logout para no interrumpir el flujo
